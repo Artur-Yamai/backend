@@ -6,6 +6,7 @@ import {
   TobaccoRoutes,
   CommentRoutes,
   favoriteTobaccoRoutes,
+  ratingRoutes,
 } from "./routes";
 
 const port: number = 6060;
@@ -23,8 +24,8 @@ app.use(UserRouter);
 app.use(TobaccoRoutes);
 app.use(CommentRoutes);
 app.use(favoriteTobaccoRoutes);
+app.use(ratingRoutes);
 
 app.listen(port, () => {
-  console.log("Server OK");
   console.log(`http://localhost:${port}`);
 });
