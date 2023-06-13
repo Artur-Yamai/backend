@@ -11,10 +11,10 @@ export const addToFavoritesTobacco = async (
   try {
     const queryResult = await db.query(
       `
-    INSERT INTO hookah.favorite_tobacco_table (user_id, tobacco_id)
-    VALUES ($1, $2)
-    RETURNING user_id AS "userId", tobacco_id AS "tobaccoId"
-    `,
+      INSERT INTO hookah.favorite_tobacco_table (user_id, tobacco_id)
+      VALUES ($1, $2)
+      RETURNING user_id AS "userId", tobacco_id AS "tobaccoId"
+      `,
       [userId, tobaccoId]
     );
 
