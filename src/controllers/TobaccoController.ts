@@ -145,7 +145,22 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
             FROM hookah.favorite_tobacco_table
             WHERE user_id = $2 AND tobacco_id = $1
           ), false) AS "isFavorite",
-          favorite_tobacco_table.user_id
+          COALESCE((
+            SELECT ROUND(SUM(rating) / COUNT(rating), 1)
+            FROM hookah.rating_table
+            WHERE hookah.rating_table.entity_id = $1
+          ), 0) AS rating,
+          (
+            SELECT COUNT(rating)
+            FROM hookah.rating_table
+            WHERE hookah.rating_table.entity_id = $1
+          ) AS "ratingsQuantity",
+          COALESCE($2 = (
+            SELECT user_id
+            FROM hookah.rating_table
+            WHERE entity_id = $1 AND user_id = $2
+          ), false) AS "isRated",
+          favorite_tobacco_table.user_id as "userId"
         FROM hookah.tobacco_table
         LEFT JOIN hookah.favorite_tobacco_table ON favorite_tobacco_table.tobacco_id = tobacco_table.tobacco_id
         WHERE tobacco_table.tobacco_id = $1 AND is_deleted = false
