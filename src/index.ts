@@ -8,6 +8,7 @@ import {
   favoriteTobaccoRoutes,
   ratingRoutes,
 } from "./routes";
+import "./utils/PGChangeTypes";
 
 const port: number = 6060;
 const app: express.Express = express();
