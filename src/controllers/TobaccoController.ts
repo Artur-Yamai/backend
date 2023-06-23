@@ -166,7 +166,11 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
             FROM hookah.rating_table
             WHERE entity_id = $1 AND user_id = $2
           ), false) AS "isRated",
-          favorite_tobacco_table.user_id as "userId"
+          COALESCE((
+            SELECT COUNT(tobacco_id)
+            FROM hookah.favorite_tobacco_table
+            WHERE favorite_tobacco_table.tobacco_id = $1
+          ), 0) AS "markQuantity"
         FROM hookah.tobacco_table
         LEFT JOIN hookah.favorite_tobacco_table ON favorite_tobacco_table.tobacco_id = tobacco_table.tobacco_id
         WHERE tobacco_table.tobacco_id = $1 AND is_deleted = false
