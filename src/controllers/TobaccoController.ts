@@ -96,7 +96,13 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
         tobacco_id AS id,
         photo_url AS "photoUrl",
         tobacco_name AS name,
-        fabricator
+        fabricator,
+        (
+          SELECT
+            COALESCE(ROUND(SUM(rating_table.rating) / COUNT(rating_table.rating), 1), 0)
+          FROM hookah.rating_table
+          WHERE rating_table.entity_id = tobacco_table.tobacco_id
+        ) AS rating
       FROM
         hookah.tobacco_table
       WHERE

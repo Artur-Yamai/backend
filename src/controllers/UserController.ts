@@ -366,7 +366,13 @@ export const getFavoritesTobaccoByUserId = async (
         tobacco_table.tobacco_id AS "id",
         tobacco_table.photo_url AS "photoUrl",
         tobacco_table.tobacco_name AS "name",
-        tobacco_table.fabricator AS "fabricator"	
+        tobacco_table.fabricator AS "fabricator",        
+        (
+          SELECT
+            COALESCE(ROUND(SUM(rating_table.rating) / COUNT(rating_table.rating), 1), 0)
+          FROM hookah.rating_table
+          WHERE rating_table.entity_id = tobacco_table.tobacco_id
+        ) AS rating
       FROM hookah.favorite_tobacco_table
       INNER JOIN hookah.tobacco_table ON tobacco_table.tobacco_id = favorite_tobacco_table.tobacco_id
       WHERE favorite_tobacco_table.user_id = $1 AND is_deleted = false
