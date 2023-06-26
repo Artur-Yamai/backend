@@ -5,7 +5,7 @@ import responseHandler from "../utils/responseHandler";
 
 const upload: multer.Multer = multer();
 
-export const addScrore = [
+export const add = [
   upload.none(),
   async (req: Request, res: Response): Promise<void> => {
     try {
@@ -51,7 +51,7 @@ export const addScrore = [
   },
 ];
 
-export const updateRating = [
+export const update = [
   upload.none(),
   async (req: Request, res: Response): Promise<void> => {
     try {
@@ -100,10 +100,7 @@ export const updateRating = [
   },
 ];
 
-export const deleteRating = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.headers.userId;
     const entityId = req.body.id;

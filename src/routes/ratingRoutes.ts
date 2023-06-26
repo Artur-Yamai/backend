@@ -6,8 +6,8 @@ const router = Router();
 
 router
   .route("/api/rating")
-  .post(checkAuth, RatingController.addScrore)
-  .put(checkAuth, RatingController.updateRating)
-  .delete(checkAuth, RatingController.deleteRating);
+  .post(checkAuth, RatingController.add)
+  .put(checkAuth, RatingController.update)
+  .delete(checkAuth, RatingController.remove);
 
 export { router };
