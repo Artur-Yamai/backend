@@ -9,7 +9,7 @@ export default {
   update: () => `
     UPDATE hookah.rating_table
     SET rating = $3
-    WHEREuser_id = $1 AND entity_id = $2
+    WHERE user_id = $1 AND entity_id = $2
   `,
 
   remove: () => `
