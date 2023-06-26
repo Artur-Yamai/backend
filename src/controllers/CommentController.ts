@@ -1,26 +1,19 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import db from "../models/db";
+import db, { CommentModels } from "../models";
 import responseHandler from "../utils/responseHandler";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   const userId = req.headers.userId;
   const { entityType, entityId, text } = req.body;
   try {
-    const queryResult = await db.query(
-      `
-      INSERT INTO hookah.comment_table (
-        comment_id,
-        user_id, 
-        entity_id, 
-        entity_type, 
-        comment_text
-      )
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING entity_id AS id
-      `,
-      [uuidv4(), userId, entityId, entityType, text]
-    );
+    const queryResult = await db.query(CommentModels.create(), [
+      uuidv4(),
+      userId,
+      entityId,
+      entityType,
+      text,
+    ]);
 
     const comment = queryResult.rows[0];
 
@@ -60,17 +53,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     const { text, id } = req.body;
     const userId = req.headers.userId;
 
-    const queryResult = await db.query(
-      `
-      UPDATE hookah.comment_table
-      SET comment_text = COALESCE($1, comment_text),
-        updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-      WHERE comment_id = $2 AND is_deleted = false
-      RETURNING entity_type AS "entityType";
-
-      `,
-      [text, id]
-    );
+    const queryResult = await db.query(CommentModels.update(), [text, id]);
 
     const comment = queryResult.rows[0];
 
@@ -101,15 +84,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     const id = req.body.id;
     const userId = req.headers.userId;
 
-    const queryResult = await db.query(
-      `
-      UPDATE hookah.comment_table
-      SET is_deleted = true, updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-      WHERE comment_id = $1 AND is_deleted = false
-      RETURNING entity_type AS "entityType"
-      `,
-      [id]
-    );
+    const queryResult = await db.query(CommentModels.remove(), [id]);
 
     const comment = queryResult.rows[0];
 

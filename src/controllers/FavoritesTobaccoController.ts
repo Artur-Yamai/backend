@@ -1,6 +1,6 @@
 import { Response, Request } from "express";
+import db, { FavoritesModels } from "../models";
 import responseHandler from "../utils/responseHandler";
-import db from "../models/db";
 
 export const addToFavoritesTobacco = async (
   req: Request,
@@ -10,11 +10,7 @@ export const addToFavoritesTobacco = async (
   const userId = req.headers.userId;
   try {
     const queryResult = await db.query(
-      `
-      INSERT INTO hookah.favorite_tobacco_table (user_id, tobacco_id)
-      VALUES ($1, $2)
-      RETURNING user_id AS "userId", tobacco_id AS "tobaccoId"
-      `,
+      FavoritesModels.addToFavoritesTobacco(),
       [userId, tobaccoId]
     );
 
@@ -54,10 +50,7 @@ export const removeToFavoritesTobacco = async (req: Request, res: Response) => {
     const userId = req.headers.userId;
 
     const queryResult = await db.query(
-      `
-      DELETE FROM hookah.favorite_tobacco_table
-      WHERE user_id = $1 AND tobacco_id = $2
-      `,
+      FavoritesModels.removeToFavoritesTobacco(),
       [userId, tobaccoId]
     );
 

@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
-import db from "../models/db";
+import db, { UserModels } from "../models";
 import { jwtSectretKey } from "../secrets";
 import { avatarsDirName } from "../constants";
 import { fileFilter } from "../utils";
@@ -31,19 +31,12 @@ export const register = async (req: Request, res: Response) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash: string = await bcrypt.hash(password, salt);
 
-    const queryResult = await db.query(
-      `
-      INSERT INTO hookah.user_table (
-        user_id,
-        login,
-        email,
-        password_hash
-      ) VALUES (
-        $1, $2, $3, $4
-      ) RETURNING user_id AS id
-      `,
-      [uuidv4(), login, email, passwordHash]
-    );
+    const queryResult = await db.query(UserModels.register(), [
+      uuidv4(),
+      login,
+      email,
+      passwordHash,
+    ]);
 
     responseHandler.success(
       req,
@@ -63,21 +56,7 @@ export const auth = async (req: Request, res: Response) => {
   try {
     const login: string = req.body.login;
 
-    const queryResult = await db.query(
-      `
-      SELECT
-        user_id AS id,
-        login,
-        email,
-        password_hash AS "passwordHash",
-        role_code AS "roleCode",
-        avatar_url AS "avatarUrl",
-        CONCAT(created_at::text, 'Z') AS "createdAt",
-        CONCAT(updated_at::text, 'Z') AS "updatedAt"
-      FROM hookah.user_table WHERE login = $1
-    `,
-      [login]
-    );
+    const queryResult = await db.query(UserModels.auth(), [login]);
 
     const user = queryResult.rows[0];
 
@@ -135,24 +114,7 @@ export const auth = async (req: Request, res: Response) => {
 export const authById = async (req: Request, res: Response) => {
   try {
     const userId = req.headers.userId;
-    const queryResult = await db.query(
-      `
-      SELECT
-        user_id AS id,
-        login,
-        email,
-        password_hash AS "passwordHash",
-        role_code AS "roleCode",
-        avatar_url AS "avatarUrl",
-        CONCAT(created_at::text, 'Z') AS "createdAt",
-        CONCAT(updated_at::text, 'Z') AS "updatedAt"
-      FROM 
-        hookah.user_table 
-      WHERE 
-        user_id = $1
-    `,
-      [userId]
-    );
+    const queryResult = await db.query(UserModels.authById(), [userId]);
 
     const user = queryResult.rows[0];
 
@@ -190,19 +152,10 @@ export const saveAvatar = [
         throw Error("Фото небыло сохранено");
       }
 
-      const queryResult = await db.query(
-        `
-        WITH oldValue AS (
-          SELECT avatar_url AS "avatarUrl" 
-          FROM hookah.user_table 
-          WHERE user_id = $2
-        )
-        UPDATE hookah.user_table 
-        SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-        WHERE user_id = $2
-        RETURNING (SELECT * FROM oldValue)`,
-        [`uploads/avatars/${fileName}`, userId]
-      );
+      const queryResult = await db.query(UserModels.saveAvatar(), [
+        `uploads/avatars/${fileName}`,
+        userId,
+      ]);
 
       const oldAvatarUrl = queryResult.rows[0]?.avatarUrl;
 
@@ -224,23 +177,7 @@ export const saveAvatar = [
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    const queryResult = await db.query(
-      `
-      SELECT
-        user_id AS id,
-        login,
-        email,
-        role_code AS "roleCode",
-        avatar_url AS "avatarUrl",
-        CONCAT(created_at::text, 'Z') AS "createdAt",
-        CONCAT(updated_at::text, 'Z') AS "updatedAt"
-      FROM
-        hookah.user_table
-      WHERE
-        user_id = $1
-    `,
-      [id]
-    );
+    const queryResult = await db.query(UserModels.getUserById(), [id]);
 
     const user = queryResult.rows[0];
 
@@ -275,10 +212,7 @@ export const loginExists = async (req: Request, res: Response) => {
       return;
     }
 
-    const queryResult = await db.query(
-      `SELECT user_id FROM hookah.user_table WHERE login = $1`,
-      [login]
-    );
+    const queryResult = await db.query(UserModels.loginExists(), [login]);
 
     const user = queryResult.rows[0];
 
@@ -309,10 +243,7 @@ export const emailExists = async (req: Request, res: Response) => {
       return;
     }
 
-    const queryResult = await db.query(
-      `SELECT user_id FROM hookah.user_table WHERE email = $1`,
-      [email]
-    );
+    const queryResult = await db.query(UserModels.emailExists(), [email]);
 
     const user = queryResult.rows[0];
 
@@ -361,22 +292,7 @@ export const getFavoritesTobaccoByUserId = async (
     const userId = req.params.id;
 
     const queryResult = await db.query(
-      `
-      SELECT
-        tobacco_table.tobacco_id AS "id",
-        tobacco_table.photo_url AS "photoUrl",
-        tobacco_table.tobacco_name AS "name",
-        tobacco_table.fabricator AS "fabricator",        
-        (
-          SELECT
-            COALESCE(ROUND(SUM(rating_table.rating) / COUNT(rating_table.rating), 1), 0)
-          FROM hookah.rating_table
-          WHERE rating_table.entity_id = tobacco_table.tobacco_id
-        ) AS rating
-      FROM hookah.favorite_tobacco_table
-      INNER JOIN hookah.tobacco_table ON tobacco_table.tobacco_id = favorite_tobacco_table.tobacco_id
-      WHERE favorite_tobacco_table.user_id = $1 AND is_deleted = false
-    `,
+      UserModels.getFavoritesTobaccoByUserId(),
       [userId]
     );
 

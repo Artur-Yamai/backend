@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import multer from "multer";
-import db from "../models/db";
+import db, { RatingModels } from "../models";
 import responseHandler from "../utils/responseHandler";
 
 const upload: multer.Multer = multer();
@@ -13,15 +13,11 @@ export const add = [
       const entityId = req.body.entityId;
       const rating = req.body.rating;
 
-      const queryResult = await db.query(
-        `
-        INSERT INTO hookah.rating_table (
-          user_id, entity_id, rating
-        ) VALUES ($1, $2, $3)
-        RETURNING rating
-        `,
-        [userId, entityId, rating]
-      );
+      const queryResult = await db.query(RatingModels.add(), [
+        userId,
+        entityId,
+        rating,
+      ]);
 
       if (queryResult.rowCount) {
         const message = "Оценка поставлен";
@@ -59,17 +55,11 @@ export const update = [
       const entityId = req.body.entityId;
       const rating = req.body.rating;
 
-      const queryResult = await db.query(
-        `
-      UPDATE
-        hookah.rating_table
-      SET
-        rating = $3
-      WHERE
-        user_id = $1 AND entity_id = $2
-      `,
-        [userId, entityId, rating]
-      );
+      const queryResult = await db.query(RatingModels.update(), [
+        userId,
+        entityId,
+        rating,
+      ]);
 
       if (queryResult.rowCount) {
         const message = "Оценка изменена";
@@ -105,13 +95,10 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     const userId = req.headers.userId;
     const entityId = req.body.id;
 
-    const queryResult = await db.query(
-      `
-        DELETE FROM hookah.rating_table
-        WHERE user_id = $1 AND entity_id = $2
-      `,
-      [userId, entityId]
-    );
+    const queryResult = await db.query(RatingModels.remove(), [
+      userId,
+      entityId,
+    ]);
 
     if (queryResult.rowCount) {
       const message = "Оценка удалена";
