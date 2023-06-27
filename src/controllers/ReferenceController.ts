@@ -4,34 +4,36 @@ import { v4 as uuidv4 } from "uuid";
 import db, { ReferenceModels } from "../models";
 import responseHandler from "../utils/responseHandler";
 
-export const getAll = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const name = req.params.name;
+const tableNotExist = (name: string): string =>
+  `Таблицы ${name}_table не существует`;
 
+export const getAll = async (req: Request, res: Response): Promise<void> => {
+  const name = req.params.name;
+
+  try {
     const queryResult = await db.query(ReferenceModels.getAll(name));
 
-    const fabricatorsList = queryResult.rows;
+    const reference = queryResult.rows;
 
-    const message = "Получен список производителей";
+    const message = `Получен справочник ${name}_table`;
     responseHandler.success(req, res, 201, message, {
       success: true,
-      message,
-      body: { fabricatorsList },
+      message: "Получен справочник",
+      body: reference,
     });
   } catch (error) {
     const err = error as DatabaseError;
     let message =
-      err.code === "42P01"
-        ? "Такой таблицы не существует"
-        : "Список производителей небыл получен";
+      err.code === "42P01" ? tableNotExist(name) : "Справочник небыл получен";
 
     responseHandler.error(req, res, error, message);
   }
 };
 
 export const create = async (req: Request, res: Response): Promise<void> => {
+  const name = req.params.name;
+
   try {
-    const name = req.params.name;
     const { value } = req.body;
 
     const queryResult = await db.query(ReferenceModels.create(name), [
@@ -39,75 +41,75 @@ export const create = async (req: Request, res: Response): Promise<void> => {
       value,
     ]);
 
-    const fabricator = queryResult.rows[0];
+    const referenceItem = queryResult.rows[0];
 
-    const message = `добавлен новый производитель - ${fabricator.id}`;
+    const message = `В справочник ${name}_table добавлен элемент - ${referenceItem.id}`;
     responseHandler.success(req, res, 201, message, {
       success: true,
-      message,
-      body: fabricator,
+      message: "Элемент справочника создан",
+      body: referenceItem,
     });
   } catch (error) {
     const err = error as DatabaseError;
     let message =
       err.code === "42P01"
-        ? "Такой таблицы не существует"
-        : "Производителей небыл создан";
+        ? tableNotExist(name)
+        : `Новый элемент справочника "${name}_table" небыл создан`;
 
     responseHandler.error(req, res, error, message);
   }
 };
 
 export const update = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const name = req.params.name;
-    const { value, id } = req.body;
+  const name = req.params.name;
+  const { value, id } = req.body;
 
+  try {
     const queryResult = await db.query(ReferenceModels.update(name), [
       id,
       value,
     ]);
 
-    const fabricator = queryResult.rows[0];
+    const referenceItem = queryResult.rows[0];
 
-    const message = `Изменен производитель - ${fabricator.id}`;
+    const message = `В справочнике ${name}_table изменен - ${referenceItem.id}`;
     responseHandler.success(req, res, 201, message, {
       success: true,
-      message,
-      body: fabricator,
+      message: "Элемент справочника обнавлен",
+      body: referenceItem,
     });
   } catch (error) {
     const err = error as DatabaseError;
     let message =
       err.code === "42P01"
-        ? "Такой таблицы не существует"
-        : "Производитель небыл изменен";
+        ? tableNotExist(name)
+        : `В справочнике "${name}_table" небыл изменен - ${id}`;
 
     responseHandler.error(req, res, error, message);
   }
 };
 
 export const remove = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const name = req.params.name;
-    const { id } = req.body;
+  const name = req.params.name;
+  const { id } = req.body;
 
+  try {
     const queryResult = await db.query(ReferenceModels.remove(name), [id]);
 
-    const fabricator = queryResult.rows[0];
+    const referenceItem = queryResult.rows[0];
 
-    const message = `Изменен производитель - ${fabricator.id}`;
+    const message = `В справочнике ${name}_table удален - ${referenceItem.id}`;
     responseHandler.success(req, res, 201, message, {
       success: true,
-      message: "Производитель удален",
-      body: fabricator,
+      message: "Элемент справочника удален",
+      body: referenceItem,
     });
   } catch (error) {
     const err = error as DatabaseError;
     let message =
       err.code === "42P01"
-        ? "Такой таблицы не существует"
-        : "Производитель небыл удален";
+        ? tableNotExist(name)
+        : `Элемент справочника "${name}_table" небыл удален`;
 
     responseHandler.error(req, res, error, message);
   }
