@@ -3,6 +3,7 @@ export default {
     SELECT ${name}_id AS id, value 
     FROM hookah.${name}_table
     WHERE is_deleted = false
+    ORDER BY value
   `,
 
   create: (name: string) => `
