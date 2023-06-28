@@ -16,17 +16,29 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
     const reference = queryResult.rows;
 
     const message = `Получен справочник ${name}_table`;
-    responseHandler.success(req, res, 201, message, {
+    responseHandler.success(req, res, 200, message, {
       success: true,
       message: "Получен справочник",
       body: reference,
     });
   } catch (error) {
     const err = error as DatabaseError;
-    let message =
-      err.code === "42P01" ? tableNotExist(name) : "Справочник небыл получен";
-
-    responseHandler.error(req, res, error, message);
+    if (err.code === "42P01") {
+      responseHandler.exception(
+        req,
+        res,
+        404,
+        err.message,
+        tableNotExist(name)
+      );
+    } else {
+      responseHandler.error(
+        req,
+        res,
+        error,
+        `Справочник "${name}_table" небыл получен`
+      );
+    }
   }
 };
 
@@ -51,12 +63,23 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error) {
     const err = error as DatabaseError;
-    let message =
-      err.code === "42P01"
-        ? tableNotExist(name)
-        : `Новый элемент справочника "${name}_table" небыл создан`;
 
-    responseHandler.error(req, res, error, message);
+    if (err.code === "42P01") {
+      responseHandler.exception(
+        req,
+        res,
+        404,
+        err.message,
+        tableNotExist(name)
+      );
+    } else {
+      responseHandler.error(
+        req,
+        res,
+        error,
+        `Новый элемент справочника "${name}_table" небыл создан`
+      );
+    }
   }
 };
 
@@ -80,12 +103,23 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error) {
     const err = error as DatabaseError;
-    let message =
-      err.code === "42P01"
-        ? tableNotExist(name)
-        : `В справочнике "${name}_table" небыл изменен - ${id}`;
 
-    responseHandler.error(req, res, error, message);
+    if (err.code === "42P01") {
+      responseHandler.exception(
+        req,
+        res,
+        404,
+        err.message,
+        tableNotExist(name)
+      );
+    } else {
+      responseHandler.error(
+        req,
+        res,
+        error,
+        `В справочнике "${name}_table" небыл изменен - ${id}`
+      );
+    }
   }
 };
 
@@ -94,23 +128,30 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.body;
 
   try {
-    const queryResult = await db.query(ReferenceModels.remove(name), [id]);
+    await db.query(ReferenceModels.remove(name), [id]);
 
-    const referenceItem = queryResult.rows[0];
-
-    const message = `В справочнике ${name}_table удален - ${referenceItem.id}`;
+    const message = `В справочнике ${name}_table удален - ${id}`;
     responseHandler.success(req, res, 201, message, {
       success: true,
       message: "Элемент справочника удален",
-      body: referenceItem,
     });
   } catch (error) {
     const err = error as DatabaseError;
-    let message =
-      err.code === "42P01"
-        ? tableNotExist(name)
-        : `Элемент справочника "${name}_table" небыл удален`;
-
-    responseHandler.error(req, res, error, message);
+    if (err.code === "42P01") {
+      responseHandler.exception(
+        req,
+        res,
+        404,
+        err.message,
+        tableNotExist(name)
+      );
+    } else {
+      responseHandler.error(
+        req,
+        res,
+        error,
+        `Элемент справочника "${name}_table" небыл удален`
+      );
+    }
   }
 };

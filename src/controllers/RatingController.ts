@@ -36,7 +36,7 @@ export const add = [
         responseHandler.exception(
           req,
           res,
-          400,
+          404,
           `userId - ${userId} не смог поставить entityId - ${entityId} оценку ${rating}`,
           message
         );
@@ -79,7 +79,7 @@ export const update = [
         responseHandler.exception(
           req,
           res,
-          400,
+          404,
           `userId - ${userId} не смог изменить оценку у entityId - ${entityId} на ${rating}`,
           message
         );
@@ -117,7 +117,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
       responseHandler.success(
         req,
         res,
-        201,
+        404,
         `userId - ${userId} не смог удалить оценку к entityId - ${entityId}`,
         {
           success: true,

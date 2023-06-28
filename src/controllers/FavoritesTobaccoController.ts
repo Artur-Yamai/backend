@@ -71,7 +71,7 @@ export const removeToFavoritesTobacco = async (req: Request, res: Response) => {
       responseHandler.exception(
         req,
         res,
-        400,
+        404,
         `tobaccoId - ${tobaccoId} не был удален из избранного у userId - ${userId}`,
         message
       );

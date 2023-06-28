@@ -66,7 +66,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     responseHandler.success(
       req,
       res,
-      200,
+      201,
       `userId - ${userId} updated comment by ${comment.entityType} with id - ${comment.entityId}`,
       {
         success: true,
@@ -103,7 +103,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     responseHandler.success(
       req,
       res,
-      200,
+      201,
       `userId - ${userId} deleted comment for ${comment.entityType} with id = ${id}`,
       {
         success: true,
