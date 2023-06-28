@@ -7,6 +7,7 @@ import {
   CommentRoutes,
   favoriteTobaccoRoutes,
   ratingRoutes,
+  referenceRoutes,
 } from "./routes";
 import "./utils/PGChangeTypes";
 
@@ -26,6 +27,7 @@ app.use(TobaccoRoutes);
 app.use(CommentRoutes);
 app.use(favoriteTobaccoRoutes);
 app.use(ratingRoutes);
+app.use(referenceRoutes);
 
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);

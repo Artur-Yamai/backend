@@ -43,12 +43,12 @@ export const create = [
         return;
       }
 
-      const { name, fabricator, description } = body;
+      const { name, fabricatorId, description } = body;
 
       const queryResult = await db.query(TobaccoModels.create(), [
         uuidv4(),
         name,
-        fabricator,
+        fabricatorId,
         description,
         userId,
         `uploads/tobaccos/${fileName}`,
@@ -141,7 +141,8 @@ export const update = [
       const fileName: string | undefined = req.file?.filename;
       const userId = req.headers.userId;
 
-      const { name, fabricator, description, id } = req.body;
+      const { name, fabricatorId, description, id } = req.body;
+      console.log(fabricatorId);
 
       if (fileName) {
         const queryResult = await db.query(TobaccoModels.getOldPhotoUrl(), [
@@ -152,7 +153,7 @@ export const update = [
 
       const queryResult = await db.query(TobaccoModels.update(), [
         name, // $1
-        fabricator, // $2
+        fabricatorId, // $2
         description, // $3
         fileName ? `uploads/tobaccos/${fileName}` : fileName, // $4
         id, // $5

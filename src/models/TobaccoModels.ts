@@ -3,7 +3,7 @@ export default {
     INSERT INTO hookah.tobacco_table (
       tobacco_id,
       tobacco_name,
-      fabricator,
+      fabricator_id,
       tobacco_description,
       user_id,
       photo_url
@@ -17,7 +17,11 @@ export default {
       tobacco_id AS id,
       photo_url AS "photoUrl",
       tobacco_name AS name,
-      fabricator,
+      (
+        SELECT value
+        FROM hookah.fabricator_table
+        WHERE fabricator_table.fabricator_id = tobacco_table.fabricator_id
+      ) AS fabricator,
       (
         SELECT
           COALESCE(ROUND(SUM(rating_table.rating) / COUNT(rating_table.rating), 1), 0)
@@ -28,13 +32,19 @@ export default {
       hookah.tobacco_table
     WHERE
       is_deleted = false
+    ORDER BY name
   `,
 
   getById: () => `
     SELECT
       tobacco_table.tobacco_id AS "id",
-      tobacco_table.tobacco_name AS "name",
-      tobacco_table.fabricator,
+      tobacco_table.tobacco_name AS "name",      
+      (
+        SELECT value
+        FROM hookah.fabricator_table
+        WHERE fabricator_table.fabricator_id = tobacco_table.fabricator_id
+      ) AS fabricator,
+      tobacco_table.fabricator_id AS "fabricatorId",
       tobacco_table.tobacco_description AS description,
       tobacco_table.photo_url AS "photoUrl",
       CONCAT(tobacco_table.created_at::text, 'Z') AS "createdAt",
@@ -80,7 +90,7 @@ export default {
       hookah.tobacco_table
     SET
       tobacco_name = COALESCE($1, tobacco_name),
-      fabricator = COALESCE($2, fabricator),
+      fabricator_id = COALESCE($2, fabricator_id),
       tobacco_description = COALESCE($3, tobacco_description),
       photo_url = COALESCE($4, photo_url),
       updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
@@ -89,7 +99,22 @@ export default {
     RETURNING 
       tobacco_id AS id,
       tobacco_name AS name,
-      fabricator,
+      (
+        SELECT value
+        FROM hookah.fabricator_table
+        WHERE fabricator_table.fabricator_id = tobacco_table.fabricator_id
+      ) AS fabricator,
+      COALESCE((
+        SELECT ROUND(SUM(rating) / COUNT(rating), 1)
+        FROM hookah.rating_table
+        WHERE hookah.rating_table.entity_id = $1
+      ), 0) AS rating,
+      (
+        SELECT COUNT(rating)
+        FROM hookah.rating_table
+        WHERE hookah.rating_table.entity_id = $1
+      ) AS "ratingsQuantity",
+      tobacco_table.fabricator_id AS "fabricatorId",
       tobacco_description AS description,
       photo_url AS "photoUrl",
       user_id AS "userId",

@@ -4,6 +4,7 @@ import FavoritesModels from "./FavoritesModels";
 import RatingModels from "./RatingModels";
 import TobaccoModels from "./TobaccoModels";
 import UserModels from "./UserModels";
+import ReferenceModels from "./ReferenceModels";
 
 export {
   CommentModels,
@@ -11,6 +12,7 @@ export {
   RatingModels,
   TobaccoModels,
   UserModels,
+  ReferenceModels,
 };
 
 export default db;
