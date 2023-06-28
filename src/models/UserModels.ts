@@ -73,7 +73,6 @@ export default {
       tobacco_table.tobacco_id AS "id",
       tobacco_table.photo_url AS "photoUrl",
       tobacco_table.tobacco_name AS "name",
-      tobacco_table.fabricator AS "fabricator",        
       (
         SELECT
           COALESCE(ROUND(SUM(rating_table.rating) / COUNT(rating_table.rating), 1), 0)
