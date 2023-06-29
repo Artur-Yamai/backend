@@ -20,7 +20,8 @@ export default {
       avatar_url AS "avatarUrl",
       CONCAT(created_at::text, 'Z') AS "createdAt",
       CONCAT(updated_at::text, 'Z') AS "updatedAt"
-    FROM hookah.user_table WHERE login = $1
+    FROM hookah.user_table 
+    WHERE login ILIKE $1
   `,
 
   authById: () => `
@@ -58,10 +59,8 @@ export default {
       avatar_url AS "avatarUrl",
       CONCAT(created_at::text, 'Z') AS "createdAt",
       CONCAT(updated_at::text, 'Z') AS "updatedAt"
-    FROM
-      hookah.user_table
-    WHERE
-      user_id = $1
+    FROM hookah.user_table
+    WHERE user_id = $1
   `,
 
   loginExists: () => `SELECT user_id FROM hookah.user_table WHERE login = $1`,
