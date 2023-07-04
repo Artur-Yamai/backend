@@ -1,6 +1,6 @@
 export default {
   create: () => `
-    INSERT INTO hookah.comment_table (
+    INSERT INTO hookah.comment (
       comment_id,
       user_id, 
       entity_id, 
@@ -12,7 +12,7 @@ export default {
   `,
 
   update: () => `
-    UPDATE hookah.comment_table
+    UPDATE hookah.comment
     SET comment_text = COALESCE($1, comment_text),
       updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
     WHERE comment_id = $2 AND is_deleted = false
@@ -20,7 +20,7 @@ export default {
   `,
 
   remove: () => `
-    UPDATE hookah.comment_table
+    UPDATE hookah.comment
     SET is_deleted = true, updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
     WHERE comment_id = $1 AND is_deleted = false
     RETURNING entity_type AS "entityType"
