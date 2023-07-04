@@ -1,6 +1,6 @@
 export default {
   create: () => `
-    INSERT INTO hookah.tobacco_table (
+    INSERT INTO hookah.tobacco (
       tobacco_id,
       tobacco_name,
       fabricator_id,
@@ -19,17 +19,17 @@ export default {
       tobacco_name AS name,
       (
         SELECT value
-        FROM hookah.fabricator_table
-        WHERE fabricator_table.fabricator_id = tobacco_table.fabricator_id
+        FROM hookah.fabricator
+        WHERE fabricator.fabricator_id = tobacco.fabricator_id
       ) AS fabricator,
       (
         SELECT
-          COALESCE(ROUND(SUM(rating_table.rating) / COUNT(rating_table.rating), 1), 0)
-        FROM hookah.rating_table
-        WHERE rating_table.entity_id = tobacco_table.tobacco_id
+          COALESCE(ROUND(SUM(rating.rating) / COUNT(rating.rating), 1), 0)
+        FROM hookah.rating
+        WHERE rating.entity_id = tobacco.tobacco_id
       ) AS rating
     FROM
-      hookah.tobacco_table
+      hookah.tobacco
     WHERE
       is_deleted = false
     ORDER BY name
@@ -37,57 +37,57 @@ export default {
 
   getById: () => `
     SELECT
-      tobacco_table.tobacco_id AS "id",
-      tobacco_table.tobacco_name AS "name",      
+      tobacco.tobacco_id AS "id",
+      tobacco.tobacco_name AS "name",      
       (
         SELECT value
-        FROM hookah.fabricator_table
-        WHERE fabricator_table.fabricator_id = tobacco_table.fabricator_id
+        FROM hookah.fabricator
+        WHERE fabricator.fabricator_id = tobacco.fabricator_id
       ) AS fabricator,
-      tobacco_table.fabricator_id AS "fabricatorId",
-      tobacco_table.tobacco_description AS description,
-      tobacco_table.photo_url AS "photoUrl",
-      CONCAT(tobacco_table.created_at::text, 'Z') AS "createdAt",
-      CONCAT(tobacco_table.updated_at::text, 'Z') AS "updatedAt",
+      tobacco.fabricator_id AS "fabricatorId",
+      tobacco.tobacco_description AS description,
+      tobacco.photo_url AS "photoUrl",
+      CONCAT(tobacco.created_at::text, 'Z') AS "createdAt",
+      CONCAT(tobacco.updated_at::text, 'Z') AS "updatedAt",
       COALESCE($1 = (
         SELECT tobacco_id
-        FROM hookah.favorite_tobacco_table
+        FROM hookah.favorite_tobacco
         WHERE user_id = $2 AND tobacco_id = $1
       ), false) AS "isFavorite",
       COALESCE((
         SELECT ROUND(SUM(rating) / COUNT(rating), 1)
-        FROM hookah.rating_table
-        WHERE hookah.rating_table.entity_id = $1
+        FROM hookah.rating
+        WHERE hookah.rating.entity_id = $1
       ), 0) AS rating,
       (
         SELECT COUNT(rating)
-        FROM hookah.rating_table
-        WHERE hookah.rating_table.entity_id = $1
+        FROM hookah.rating
+        WHERE hookah.rating.entity_id = $1
       ) AS "ratingsQuantity",
       COALESCE($2 = (
         SELECT user_id
-        FROM hookah.rating_table
+        FROM hookah.rating
         WHERE entity_id = $1 AND user_id = $2
       ), false) AS "isRated",
       COALESCE((
         SELECT COUNT(tobacco_id)
-        FROM hookah.favorite_tobacco_table
-        WHERE favorite_tobacco_table.tobacco_id = $1
+        FROM hookah.favorite_tobacco
+        WHERE favorite_tobacco.tobacco_id = $1
       ), 0) AS "markQuantity"
-    FROM hookah.tobacco_table
-    LEFT JOIN hookah.favorite_tobacco_table ON favorite_tobacco_table.tobacco_id = tobacco_table.tobacco_id
-    WHERE tobacco_table.tobacco_id = $1 AND is_deleted = false
+    FROM hookah.tobacco
+    LEFT JOIN hookah.favorite_tobacco ON favorite_tobacco.tobacco_id = tobacco.tobacco_id
+    WHERE tobacco.tobacco_id = $1 AND is_deleted = false
   `,
 
   getOldPhotoUrl: () => `
     SELECT photo_url AS "photoUrl"
-    FROM hookah.tobacco_table
+    FROM hookah.tobacco
     WHERE tobacco_id = $1
   `,
 
   update: () => `
     UPDATE 
-      hookah.tobacco_table
+      hookah.tobacco
     SET
       tobacco_name = COALESCE($1, tobacco_name),
       fabricator_id = COALESCE($2, fabricator_id),
@@ -101,20 +101,20 @@ export default {
       tobacco_name AS name,
       (
         SELECT value
-        FROM hookah.fabricator_table
-        WHERE fabricator_table.fabricator_id = tobacco_table.fabricator_id
+        FROM hookah.fabricator
+        WHERE fabricator.fabricator_id = tobacco.fabricator_id
       ) AS fabricator,
       COALESCE((
         SELECT ROUND(SUM(rating) / COUNT(rating), 1)
-        FROM hookah.rating_table
-        WHERE hookah.rating_table.entity_id = $1
+        FROM hookah.rating
+        WHERE hookah.rating.entity_id = $1
       ), 0) AS rating,
       (
         SELECT COUNT(rating)
-        FROM hookah.rating_table
-        WHERE hookah.rating_table.entity_id = $1
+        FROM hookah.rating
+        WHERE hookah.rating.entity_id = $1
       ) AS "ratingsQuantity",
-      tobacco_table.fabricator_id AS "fabricatorId",
+      tobacco.fabricator_id AS "fabricatorId",
       tobacco_description AS description,
       photo_url AS "photoUrl",
       user_id AS "userId",
@@ -124,17 +124,17 @@ export default {
       SELECT
         COALESCE($5 = (
           SELECT tobacco_id
-          FROM hookah.favorite_tobacco_table
+          FROM hookah.favorite_tobacco
           WHERE user_id = $6 AND tobacco_id = $5
         ), false) AS "isFavorite"
-      FROM hookah.tobacco_table
-      LEFT JOIN hookah.favorite_tobacco_table ON favorite_tobacco_table.tobacco_id = tobacco_table.tobacco_id
-      WHERE tobacco_table.tobacco_id = $5 AND is_deleted = false
+      FROM hookah.tobacco
+      LEFT JOIN hookah.favorite_tobacco ON favorite_tobacco.tobacco_id = tobacco.tobacco_id
+      WHERE tobacco.tobacco_id = $5 AND is_deleted = false
     ) AS "isFavorite"
   `,
 
   remove: () => `
-    UPDATE hookah.tobacco_table
+    UPDATE hookah.tobacco
     SET is_deleted = true
     WHERE tobacco_id = $1
     RETURNING
@@ -144,16 +144,14 @@ export default {
 
   getTobaccoComments: () => `
     SELECT 
-      comment_table.comment_id AS "id",
-      comment_table.entity_id AS "tobaccoId",
-      CONCAT(comment_table.created_at::text, 'Z') AS "createdAt",
-      CONCAT(comment_table.updated_at::text, 'Z') AS "updatedAt",
-      user_table.user_id AS "userId",
-      user_table.login AS "userLogin",
-      user_table.avatar_url AS "userAvatarUrl",
-      comment_table.comment_text AS "text"    
-    FROM hookah.comment_table
-    INNER JOIN hookah.user_table ON comment_table.user_id = user_table.user_id
-    WHERE comment_table.entity_id = $1 AND comment_table.is_deleted = false;
+      comment.comment_id AS "id",
+      comment.entity_id AS "tobaccoId",
+      hookah.user.user_id AS "userId",
+      hookah.user.login AS login,
+      hookah.user.avatar_url AS "userAvatarUrl",
+      hookah.comment.comment_text AS "text"
+    FROM hookah.comment
+    INNER JOIN hookah.user ON comment.user_id = hookah.user.user_id
+    WHERE comment.entity_id = $1 AND comment.is_deleted = false
   `,
 };

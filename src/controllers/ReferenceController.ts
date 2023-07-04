@@ -4,8 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import db, { ReferenceModels } from "../models";
 import responseHandler from "../utils/responseHandler";
 
-const tableNotExist = (name: string): string =>
-  `Таблицы ${name}_table не существует`;
+const tableNotExist = (name: string): string => `Таблицы ${name} не существует`;
 
 export const getAll = async (req: Request, res: Response): Promise<void> => {
   const name = req.params.name;
@@ -15,7 +14,7 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 
     const reference = queryResult.rows;
 
-    const message = `Получен справочник ${name}_table`;
+    const message = `Получен справочник ${name}`;
     responseHandler.success(req, res, 200, message, {
       success: true,
       message: "Получен справочник",
@@ -36,7 +35,7 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
         req,
         res,
         error,
-        `Справочник "${name}_table" небыл получен`
+        `Справочник "${name}" небыл получен`
       );
     }
   }
@@ -55,7 +54,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 
     const referenceItem = queryResult.rows[0];
 
-    const message = `В справочник ${name}_table добавлен элемент - ${referenceItem.id}`;
+    const message = `В справочник ${name} добавлен элемент - ${referenceItem.id}`;
     responseHandler.success(req, res, 201, message, {
       success: true,
       message: "Элемент справочника создан",
@@ -77,7 +76,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
         req,
         res,
         error,
-        `Новый элемент справочника "${name}_table" небыл создан`
+        `Новый элемент справочника "${name}" небыл создан`
       );
     }
   }
@@ -95,7 +94,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 
     const referenceItem = queryResult.rows[0];
 
-    const message = `В справочнике ${name}_table изменен - ${referenceItem.id}`;
+    const message = `В справочнике ${name} изменен - ${referenceItem.id}`;
     responseHandler.success(req, res, 201, message, {
       success: true,
       message: "Элемент справочника обнавлен",
@@ -117,7 +116,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
         req,
         res,
         error,
-        `В справочнике "${name}_table" небыл изменен - ${id}`
+        `В справочнике "${name}" небыл изменен - ${id}`
       );
     }
   }
@@ -130,7 +129,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
     await db.query(ReferenceModels.remove(name), [id]);
 
-    const message = `В справочнике ${name}_table удален - ${id}`;
+    const message = `В справочнике ${name} удален - ${id}`;
     responseHandler.success(req, res, 201, message, {
       success: true,
       message: "Элемент справочника удален",
@@ -150,7 +149,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
         req,
         res,
         error,
-        `Элемент справочника "${name}_table" небыл удален`
+        `Элемент справочника "${name}" небыл удален`
       );
     }
   }
