@@ -15,14 +15,13 @@ export default {
     UPDATE hookah.comment
     SET comment_text = COALESCE($1, comment_text),
       updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-    WHERE comment_id = $2 AND is_deleted = false
+    WHERE comment_id = $2
     RETURNING entity_type AS "entityType";
   `,
 
   remove: () => `
-    UPDATE hookah.comment
-    SET is_deleted = true, updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-    WHERE comment_id = $1 AND is_deleted = false
+    DELETE FROM hookah.comment
+    WHERE comment_id = $1    
     RETURNING entity_type AS "entityType"
   `,
 };

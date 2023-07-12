@@ -2,7 +2,6 @@ export default {
   getAll: (name: string) => `
     SELECT ${name}_id AS id, value 
     FROM hookah.${name}
-    WHERE is_deleted = false
     ORDER BY value
   `,
 
@@ -20,8 +19,7 @@ export default {
   `,
 
   remove: (name: string) => `
-    UPDATE hookah.${name}
-    SET is_deleted = true
+    DELETE FROM hookah.${name}
     WHERE ${name}_id = $1
     RETURNING ${name}_id AS id
   `,

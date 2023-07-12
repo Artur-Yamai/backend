@@ -80,6 +80,6 @@ export default {
       ) AS rating
     FROM hookah.favorite_tobacco
     INNER JOIN hookah.tobacco ON tobacco.tobacco_id = favorite_tobacco.tobacco_id
-    WHERE favorite_tobacco.user_id = $1 AND is_deleted = false
+    WHERE favorite_tobacco.user_id = $1
   `,
 };

@@ -76,7 +76,7 @@ export default {
       ), 0) AS "markQuantity"
     FROM hookah.tobacco
     LEFT JOIN hookah.favorite_tobacco ON favorite_tobacco.tobacco_id = tobacco.tobacco_id
-    WHERE tobacco.tobacco_id = $1 AND is_deleted = false
+    WHERE tobacco.tobacco_id = $1
   `,
 
   getOldPhotoUrl: () => `
@@ -129,17 +129,14 @@ export default {
         ), false) AS "isFavorite"
       FROM hookah.tobacco
       LEFT JOIN hookah.favorite_tobacco ON favorite_tobacco.tobacco_id = tobacco.tobacco_id
-      WHERE tobacco.tobacco_id = $5 AND is_deleted = false
+      WHERE tobacco.tobacco_id = $5
     ) AS "isFavorite"
   `,
 
   remove: () => `
-    UPDATE hookah.tobacco
-    SET is_deleted = true
+    DELETE FROM hookah.tobacco
     WHERE tobacco_id = $1
-    RETURNING
-      tobacco_id AS id,
-      is_deleted AS "isDeleted"
+    RETURNING tobacco_id AS id
   `,
 
   getTobaccoComments: () => `
@@ -152,6 +149,6 @@ export default {
       hookah.comment.comment_text AS "text"
     FROM hookah.comment
     INNER JOIN hookah.user ON comment.user_id = hookah.user.user_id
-    WHERE comment.entity_id = $1 AND comment.is_deleted = false
+    WHERE comment.entity_id = $1
   `,
 };
