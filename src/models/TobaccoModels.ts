@@ -17,22 +17,16 @@ export default {
       tobacco_id AS id,
       photo_url AS "photoUrl",
       tobacco_name AS name,
-      (
-        SELECT value
-        FROM hookah.fabricator
-        WHERE fabricator.fabricator_id = tobacco.fabricator_id
-      ) AS fabricator,
+      fabricator.value AS fabricator,
       (
         SELECT
-          COALESCE(ROUND(SUM(rating.rating) / COUNT(rating.rating), 1), 0)
+          COALESCE(ROUND(SUM(value) / COUNT(rating.value), 1), 0)
         FROM hookah.rating
         WHERE rating.entity_id = tobacco.tobacco_id
       ) AS rating
-    FROM
-      hookah.tobacco
-    WHERE
-      is_deleted = false
-    ORDER BY name
+    FROM hookah.tobacco 
+      LEFT JOIN hookah.fabricator ON hookah.tobacco.fabricator_id = hookah.fabricator.fabricator_id
+    ORDER BY name, rating
   `,
 
   getById: () => `
@@ -55,7 +49,7 @@ export default {
         WHERE user_id = $2 AND tobacco_id = $1
       ), false) AS "isFavorite",
       COALESCE((
-        SELECT ROUND(SUM(rating) / COUNT(rating), 1)
+        SELECT ROUND(SUM(value) / COUNT(value), 1)
         FROM hookah.rating
         WHERE hookah.rating.entity_id = $1
       ), 0) AS rating,
@@ -105,7 +99,7 @@ export default {
         WHERE fabricator.fabricator_id = tobacco.fabricator_id
       ) AS fabricator,
       COALESCE((
-        SELECT ROUND(SUM(rating) / COUNT(rating), 1)
+        SELECT ROUND(SUM(value) / COUNT(value), 1)
         FROM hookah.rating
         WHERE hookah.rating.entity_id = $1
       ), 0) AS rating,
