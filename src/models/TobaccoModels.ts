@@ -17,22 +17,16 @@ export default {
       tobacco_id AS id,
       photo_url AS "photoUrl",
       tobacco_name AS name,
-      (
-        SELECT value
-        FROM hookah.fabricator
-        WHERE fabricator.fabricator_id = tobacco.fabricator_id
-      ) AS fabricator,
+      fabricator.value AS fabricator,
       (
         SELECT
-          COALESCE(ROUND(SUM(rating.rating) / COUNT(rating.rating), 1), 0)
+          COALESCE(ROUND(SUM(value) / COUNT(rating.value), 1), 0)
         FROM hookah.rating
         WHERE rating.entity_id = tobacco.tobacco_id
       ) AS rating
-    FROM
-      hookah.tobacco
-    WHERE
-      is_deleted = false
-    ORDER BY name
+    FROM hookah.tobacco 
+      LEFT JOIN hookah.fabricator ON hookah.tobacco.fabricator_id = hookah.fabricator.fabricator_id
+    ORDER BY name, rating
   `,
 
   getById: () => `
@@ -55,7 +49,7 @@ export default {
         WHERE user_id = $2 AND tobacco_id = $1
       ), false) AS "isFavorite",
       COALESCE((
-        SELECT ROUND(SUM(rating) / COUNT(rating), 1)
+        SELECT ROUND(SUM(value) / COUNT(value), 1)
         FROM hookah.rating
         WHERE hookah.rating.entity_id = $1
       ), 0) AS rating,
@@ -76,7 +70,7 @@ export default {
       ), 0) AS "markQuantity"
     FROM hookah.tobacco
     LEFT JOIN hookah.favorite_tobacco ON favorite_tobacco.tobacco_id = tobacco.tobacco_id
-    WHERE tobacco.tobacco_id = $1 AND is_deleted = false
+    WHERE tobacco.tobacco_id = $1
   `,
 
   getOldPhotoUrl: () => `
@@ -105,7 +99,7 @@ export default {
         WHERE fabricator.fabricator_id = tobacco.fabricator_id
       ) AS fabricator,
       COALESCE((
-        SELECT ROUND(SUM(rating) / COUNT(rating), 1)
+        SELECT ROUND(SUM(value) / COUNT(value), 1)
         FROM hookah.rating
         WHERE hookah.rating.entity_id = $1
       ), 0) AS rating,
@@ -129,17 +123,14 @@ export default {
         ), false) AS "isFavorite"
       FROM hookah.tobacco
       LEFT JOIN hookah.favorite_tobacco ON favorite_tobacco.tobacco_id = tobacco.tobacco_id
-      WHERE tobacco.tobacco_id = $5 AND is_deleted = false
+      WHERE tobacco.tobacco_id = $5
     ) AS "isFavorite"
   `,
 
   remove: () => `
-    UPDATE hookah.tobacco
-    SET is_deleted = true
+    DELETE FROM hookah.tobacco
     WHERE tobacco_id = $1
-    RETURNING
-      tobacco_id AS id,
-      is_deleted AS "isDeleted"
+    RETURNING tobacco_id AS id
   `,
 
   getTobaccoComments: () => `
@@ -152,6 +143,6 @@ export default {
       hookah.comment.comment_text AS "text"
     FROM hookah.comment
     INNER JOIN hookah.user ON comment.user_id = hookah.user.user_id
-    WHERE comment.entity_id = $1 AND comment.is_deleted = false
+    WHERE comment.entity_id = $1
   `,
 };
