@@ -61,16 +61,9 @@ export const auth = async (req: Request, res: Response) => {
     const user = queryResult.rows[0];
 
     if (!user) {
-      const message: string = "Неверный логин или пароль";
-
-      responseHandler.exception(
-        req,
-        res,
-        404,
-        `${login} - ${message}`,
-        message
-      );
-      return;
+      const respMessage: string = "Неверный логин или пароль";
+      const logText = `${login} - ${respMessage}`;
+      return responseHandler.notFound(req, res, logText, respMessage);
     }
 
     const isValid: boolean = await bcrypt.compare(
@@ -119,15 +112,9 @@ export const authById = async (req: Request, res: Response) => {
     const user = queryResult.rows[0];
 
     if (!user) {
-      const message: string = "Пользователь не найден";
-      responseHandler.exception(
-        req,
-        res,
-        404,
-        `userId - ${userId} : ${message}`,
-        message
-      );
-      return;
+      const respMessage: string = "Пользователь не найден";
+      const logText = `userId - ${userId} : ${respMessage}`;
+      return responseHandler.notFound(req, res, logText, respMessage);
     }
 
     delete user.passwordHash;
@@ -182,15 +169,9 @@ export const getUserById = async (req: Request, res: Response) => {
     const user = queryResult.rows[0];
 
     if (!user) {
-      const message: string = "Пользователь не найден";
-      responseHandler.exception(
-        req,
-        res,
-        404,
-        `userId - ${id} : ${message}`,
-        message
-      );
-      return;
+      const respMessage: string = "Пользователь не найден";
+      const logText: string = `userId - ${id} : ${respMessage}`;
+      return responseHandler.notFound(req, res, logText, respMessage);
     }
 
     responseHandler.success(req, res, 200, `userId - ${user.id}`, {

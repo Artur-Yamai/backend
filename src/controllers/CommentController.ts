@@ -58,22 +58,17 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     const comment = queryResult.rows[0];
 
     if (!comment?.entityType) {
-      const message = "Комментарий не найден";
-      responseHandler.exception(req, res, 404, message, message);
+      const respMessage = "Комментарий не найден";
+      responseHandler.notFound(req, res, respMessage, respMessage);
       return;
     }
 
-    responseHandler.success(
-      req,
-      res,
-      201,
-      `userId - ${userId} updated comment by ${comment.entityType} with id - ${comment.entityId}`,
-      {
-        success: true,
-        message: "Комментарий успешно обновлен",
-        body: comment,
-      }
-    );
+    const logText = `userId - ${userId} updated comment by ${comment.entityType} with id - ${comment.entityId}`;
+    responseHandler.success(req, res, 201, logText, {
+      success: true,
+      message: "Комментарий успешно обновлен",
+      body: comment,
+    });
   } catch (error) {
     responseHandler.error(req, res, error, "Комментарий не был обновлен");
   }
@@ -89,27 +84,14 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     const comment = queryResult.rows[0];
 
     if (!comment?.entityType) {
-      const message = "Такой комментарий не найден";
-      responseHandler.exception(
-        req,
-        res,
-        404,
-        `comment by commentId - ${id} from userId - ${userId} - ${message}`,
-        message
-      );
+      const respMessage = "Такой комментарий не найден";
+      const logText = `comment by commentId - ${id} from userId - ${userId} - ${respMessage}`;
+      responseHandler.notFound(req, res, logText, respMessage);
       return;
     }
 
-    responseHandler.success(
-      req,
-      res,
-      201,
-      `userId - ${userId} deleted comment for ${comment.entityType} with id = ${id}`,
-      {
-        success: true,
-        message: "Комментарий удален",
-      }
-    );
+    const logText = `userId - ${userId} deleted comment for ${comment.entityType} with id = ${id}`;
+    responseHandler.forRemoved(req, res, logText);
   } catch (error) {
     responseHandler.error(req, res, error, "Комментарий не был удален");
   }

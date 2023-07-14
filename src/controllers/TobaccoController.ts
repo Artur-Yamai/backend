@@ -112,16 +112,9 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
     const tobacco = queryResult.rows[0];
 
     if (!tobacco) {
-      const message: string = "Данные отстуствуют";
-
-      responseHandler.exception(
-        req,
-        res,
-        404,
-        `tobaccoId - ${tobaccoId} : ${message}`,
-        message
-      );
-      return;
+      const respMessage: string = "Данные отстуствуют";
+      const logText: string = `tobaccoId - ${tobaccoId} : ${respMessage}`;
+      return responseHandler.notFound(req, res, logText, respMessage);
     }
 
     responseHandler.success(req, res, 200, `tobaccoId - ${tobaccoId}`, {
@@ -163,15 +156,9 @@ export const update = [
       const tobacco = queryResult.rows[0];
 
       if (!tobacco) {
-        const message = "табак не найден";
-        responseHandler.exception(
-          req,
-          res,
-          404,
-          `tobaccoId "${id}" - не найден`,
-          message
-        );
-        return;
+        const logText = `tobaccoId "${id}" - не найден`;
+        const respMessage = "табак не найден";
+        return responseHandler.notFound(req, res, logText, respMessage);
       }
 
       if (oldPhotoUrl) {
@@ -208,27 +195,13 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     const tobacco = queryResult.rows[0];
 
     if (!tobacco) {
-      const message = "Такого табака нет";
-      responseHandler.exception(
-        req,
-        res,
-        404,
-        `tobaccoId - ${id} - ${message}`,
-        message
-      );
-      return;
+      const respMessage = "Такого табака нет";
+      const logText = `tobaccoId - ${id} - ${respMessage}`;
+      return responseHandler.notFound(req, res, logText, respMessage);
     }
 
-    responseHandler.success(
-      req,
-      res,
-      200,
-      `userId - ${userId} deleted tobaccoId - ${id}`,
-      {
-        success: true,
-        message: "Табак удален",
-      }
-    );
+    const logText = `userId - ${userId} deleted tobaccoId - ${id}`;
+    responseHandler.forRemoved(req, res, logText);
   } catch (error) {
     responseHandler.error(req, res, error, "Табак не был удален");
   }

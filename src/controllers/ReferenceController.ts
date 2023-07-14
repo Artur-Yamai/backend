@@ -23,13 +23,7 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     const err = error as DatabaseError;
     if (err.code === "42P01") {
-      responseHandler.exception(
-        req,
-        res,
-        404,
-        err.message,
-        tableNotExist(name)
-      );
+      responseHandler.notFound(req, res, err.message, tableNotExist(name));
     } else {
       responseHandler.error(
         req,
@@ -64,13 +58,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     const err = error as DatabaseError;
 
     if (err.code === "42P01") {
-      responseHandler.exception(
-        req,
-        res,
-        404,
-        err.message,
-        tableNotExist(name)
-      );
+      responseHandler.notFound(req, res, err.message, tableNotExist(name));
     } else {
       responseHandler.error(
         req,
@@ -104,13 +92,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     const err = error as DatabaseError;
 
     if (err.code === "42P01") {
-      responseHandler.exception(
-        req,
-        res,
-        404,
-        err.message,
-        tableNotExist(name)
-      );
+      responseHandler.notFound(req, res, err.message, tableNotExist(name));
     } else {
       responseHandler.error(
         req,
@@ -129,21 +111,12 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
     await db.query(ReferenceModels.remove(name), [id]);
 
-    const message = `В справочнике ${name} удален - ${id}`;
-    responseHandler.success(req, res, 201, message, {
-      success: true,
-      message: "Элемент справочника удален",
-    });
+    const logText = `В справочнике ${name} удален - ${id}`;
+    responseHandler.forRemoved(req, res, logText);
   } catch (error) {
     const err = error as DatabaseError;
     if (err.code === "42P01") {
-      responseHandler.exception(
-        req,
-        res,
-        404,
-        err.message,
-        tableNotExist(name)
-      );
+      responseHandler.notFound(req, res, err.message, tableNotExist(name));
     } else {
       responseHandler.error(
         req,
