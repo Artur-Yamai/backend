@@ -55,26 +55,12 @@ export const removeToFavoritesTobacco = async (req: Request, res: Response) => {
     );
 
     if (queryResult.rowCount) {
-      const message = "Табак удален из избранного";
-      responseHandler.success(
-        req,
-        res,
-        201,
-        `tobaccoId - ${tobaccoId} удален из избранного у userId - ${userId}`,
-        {
-          success: true,
-          message,
-        }
-      );
+      const logText = `tobaccoId - ${tobaccoId} удален из избранного у userId - ${userId}`;
+      responseHandler.forRemoved(req, res, logText);
     } else {
-      const message = "Табак не был удален из избранного";
-      responseHandler.exception(
-        req,
-        res,
-        404,
-        `tobaccoId - ${tobaccoId} не был удален из избранного у userId - ${userId}`,
-        message
-      );
+      const respMessage = "Табак не был удален из избранного";
+      const logText = `tobaccoId - ${tobaccoId} не был удален из избранного у userId - ${userId}`;
+      responseHandler.notFound(req, res, logText, respMessage);
     }
   } catch (error) {
     responseHandler.error(req, res, error, "Табак небыл удален из избранного");

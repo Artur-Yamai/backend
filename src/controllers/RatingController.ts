@@ -32,14 +32,9 @@ export const add = [
           }
         );
       } else {
-        const message = "Оценка не поставлен";
-        responseHandler.exception(
-          req,
-          res,
-          404,
-          `userId - ${userId} не смог поставить entityId - ${entityId} оценку ${rating}`,
-          message
-        );
+        const respMessage = "Оценка не поставлен";
+        const logText = `userId - ${userId} не смог поставить entityId - ${entityId} оценку ${rating}`;
+        responseHandler.notFound(req, res, logText, respMessage);
       }
     } catch (error) {
       responseHandler.error(req, res, error, "Оценка не была сохранена");
@@ -75,14 +70,9 @@ export const update = [
           }
         );
       } else {
-        const message = "Оценка не поставлен";
-        responseHandler.exception(
-          req,
-          res,
-          404,
-          `userId - ${userId} не смог изменить оценку у entityId - ${entityId} на ${rating}`,
-          message
-        );
+        const respMessage = "Оценка не поставлен";
+        const logText = `userId - ${userId} не смог изменить оценку у entityId - ${entityId} на ${rating}`;
+        responseHandler.notFound(req, res, logText, respMessage);
       }
     } catch (error) {
       responseHandler.error(req, res, error, "Оценка не была изменена");
@@ -101,29 +91,12 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     ]);
 
     if (queryResult.rowCount) {
-      const message = "Оценка удалена";
-      responseHandler.success(
-        req,
-        res,
-        201,
-        `userId - ${userId} удалил оценку к entityId - ${entityId}`,
-        {
-          success: true,
-          message,
-        }
-      );
+      const logText = `userId - ${userId} удалил оценку к entityId - ${entityId}`;
+      responseHandler.forRemoved(req, res, logText);
     } else {
-      const message = "Оценка не удалена";
-      responseHandler.success(
-        req,
-        res,
-        404,
-        `userId - ${userId} не смог удалить оценку к entityId - ${entityId}`,
-        {
-          success: true,
-          message,
-        }
-      );
+      const logText = `userId - ${userId} не смог удалить оценку к entityId - ${entityId}`;
+      const respMessage = "Оценка не удалена";
+      responseHandler.notFound(req, res, logText, respMessage);
     }
   } catch (error) {
     responseHandler.error(req, res, error, "Оценка не была удалена");
