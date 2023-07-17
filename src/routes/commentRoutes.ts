@@ -1,15 +1,15 @@
 import { Router } from "express";
 import multer from "multer";
-import { CommentController } from "../controllers";
+import { TobaccoCommentController } from "../controllers";
 import { checkAuth } from "../utils";
 
 const router = Router();
 const upload: multer.Multer = multer();
 
 router
-  .route("/api/comments")
-  .post(upload.none(), checkAuth, CommentController.create)
-  .put(upload.none(), checkAuth, CommentController.update)
-  .delete(checkAuth, CommentController.remove);
+  .route("/api/comments/tobacco")
+  .post(upload.none(), checkAuth, TobaccoCommentController.create)
+  .put(upload.none(), checkAuth, TobaccoCommentController.update)
+  .delete(checkAuth, TobaccoCommentController.remove);
 
 export { router };

@@ -1,17 +1,16 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import db, { CommentModels } from "../models";
-import responseHandler from "../utils/responseHandler";
+import db, { CommentModels } from "../../models";
+import responseHandler from "../../utils/responseHandler";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   const userId = req.headers.userId;
-  const { entityType, entityId, text } = req.body;
+  const { tobaccoId, text } = req.body;
   try {
     const queryResult = await db.query(CommentModels.create(), [
       uuidv4(),
       userId,
-      entityId,
-      entityType,
+      tobaccoId,
       text,
     ]);
 
@@ -34,14 +33,13 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   } catch (error: any) {
     if (error?.detail?.indexOf("already exists") > -1) {
       const message = "Нельзя оставлять более одного комментария";
-      responseHandler.exception(
+      return responseHandler.exception(
         req,
         res,
         406,
-        `userId - ${userId} : попытка добавления более одного комментария для ${entityType} - ${entityId}`,
+        `userId - ${userId} : попытка добавления более одного комментария для табака - ${tobaccoId}`,
         message
       );
-      return;
     }
 
     responseHandler.error(req, res, error, "Комментарий не был создан");
@@ -53,14 +51,17 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     const { text, id } = req.body;
     const userId = req.headers.userId;
 
-    const queryResult = await db.query(CommentModels.update(), [text, id]);
+    const queryResult = await db.query(CommentModels.update(), [
+      text,
+      id,
+      userId,
+    ]);
 
     const comment = queryResult.rows[0];
 
-    if (!comment?.entityType) {
+    if (!comment?.id) {
       const respMessage = "Комментарий не найден";
-      responseHandler.notFound(req, res, respMessage, respMessage);
-      return;
+      return responseHandler.notFound(req, res, respMessage, respMessage);
     }
 
     const logText = `userId - ${userId} updated comment by ${comment.entityType} with id - ${comment.entityId}`;
@@ -79,31 +80,27 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     const id = req.body.id;
     const userId = req.headers.userId;
 
-    console.log(id);
-
     const queryResult = await db.query(CommentModels.remove(), [id]);
 
     const comment = queryResult.rows[0];
 
-    if (!comment?.entity_type) {
+    if (!comment?.comment_id) {
       const respMessage = "Такой комментарий не найден";
-      const logText = `comment by commentId - ${id} from userId - ${userId} - ${respMessage}`;
-      responseHandler.notFound(req, res, logText, respMessage);
-      return;
+      const logText = `комментарий - ${id} юзера - ${userId} - ${respMessage}`;
+      return responseHandler.notFound(req, res, logText, respMessage);
     }
 
     await db.query(CommentModels.saveDeletedComment(), [
-      uuidv4(),
+      uuidv4(), // deleted_id
       comment.comment_id,
       comment.user_id,
-      comment.entity_id,
-      comment.entity_type,
+      comment.tobacco_id,
       comment.comment_text,
       comment.created_at,
       comment.updated_at,
     ]);
 
-    const logText = `userId - ${userId} deleted comment for ${comment.entityType} with id = ${id}`;
+    const logText = `userId - ${userId} удалил комментарий табака - ${id}`;
     responseHandler.forRemoved(req, res, logText);
   } catch (error) {
     responseHandler.error(req, res, error, "Комментарий не был удален");

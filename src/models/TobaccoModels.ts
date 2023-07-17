@@ -20,9 +20,9 @@ export default {
       fabricator.value AS fabricator,
       (
         SELECT
-          COALESCE(ROUND(SUM(value) / COUNT(rating.value), 1), 0)
-        FROM hookah.rating
-        WHERE rating.entity_id = tobacco.tobacco_id
+          COALESCE(ROUND(SUM(value) / COUNT(tobacco_rating.value), 1), 0)
+        FROM hookah.tobacco_rating
+        WHERE tobacco_rating.tobacco_id = tobacco.tobacco_id
       ) AS rating
     FROM hookah.tobacco 
       LEFT JOIN hookah.fabricator ON hookah.tobacco.fabricator_id = hookah.fabricator.fabricator_id
@@ -50,18 +50,18 @@ export default {
       ), false) AS "isFavorite",
       COALESCE((
         SELECT ROUND(SUM(value) / COUNT(value), 1)
-        FROM hookah.rating
-        WHERE hookah.rating.entity_id = $1
+        FROM hookah.tobacco_rating
+        WHERE hookah.tobacco_rating.tobacco_id = $1
       ), 0) AS rating,
       (
-        SELECT COUNT(rating)
-        FROM hookah.rating
-        WHERE hookah.rating.entity_id = $1
+        SELECT COUNT(value)
+        FROM hookah.tobacco_rating
+        WHERE hookah.tobacco_rating.tobacco_id = $1
       ) AS "ratingsQuantity",
       COALESCE($2 = (
         SELECT user_id
-        FROM hookah.rating
-        WHERE entity_id = $1 AND user_id = $2
+        FROM hookah.tobacco_rating
+        WHERE tobacco_id = $1 AND user_id = $2
       ), false) AS "isRated",
       COALESCE((
         SELECT COUNT(tobacco_id)
@@ -100,13 +100,13 @@ export default {
       ) AS fabricator,
       COALESCE((
         SELECT ROUND(SUM(value) / COUNT(value), 1)
-        FROM hookah.rating
-        WHERE hookah.rating.entity_id = $1
+        FROM hookah.tobacco_rating
+        WHERE hookah.tobacco_rating.tobacco_id = $1
       ), 0) AS rating,
       (
         SELECT COUNT(rating)
-        FROM hookah.rating
-        WHERE hookah.rating.entity_id = $1
+        FROM hookah.tobacco_rating
+        WHERE hookah.tobacco_rating.tobacco_id = $1
       ) AS "ratingsQuantity",
       tobacco.fabricator_id AS "fabricatorId",
       tobacco_description AS description,
@@ -151,14 +151,14 @@ export default {
 
   getTobaccoComments: () => `
     SELECT 
-      comment.comment_id AS "id",
-      comment.entity_id AS "tobaccoId",
+    tobacco_comment.comment_id AS "id",
+      tobacco_comment.tobacco_id AS "tobaccoId",
       hookah.user.user_id AS "userId",
       hookah.user.login AS login,
       hookah.user.avatar_url AS "userAvatarUrl",
-      hookah.comment.comment_text AS "text"
-    FROM hookah.comment
-    INNER JOIN hookah.user ON comment.user_id = hookah.user.user_id
-    WHERE comment.entity_id = $1
+      hookah.tobacco_comment.comment_text AS "text"
+    FROM hookah.tobacco_comment
+    INNER JOIN hookah.user ON tobacco_comment.user_id = hookah.user.user_id
+    WHERE tobacco_comment.tobacco_id = $1
   `,
 };
