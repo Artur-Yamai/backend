@@ -79,8 +79,6 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     const id = req.body.id;
     const userId = req.headers.userId;
 
-    console.log(id);
-
     const queryResult = await db.query(CommentModels.remove(), [id]);
 
     const comment = queryResult.rows[0];
