@@ -130,7 +130,23 @@ export default {
   remove: () => `
     DELETE FROM hookah.tobacco
     WHERE tobacco_id = $1
-    RETURNING tobacco_id AS id
+    RETURNING *
+  `,
+
+  saveDeletedTobacco: () => `
+    INSERT INTO deleted.tobacco (
+      deleted_id,
+      tobacco_id,
+      tobacco_name,
+      fabricator_id,
+      tobacco_description,
+      photo_url,
+      user_id,
+      created_at,
+      updated_at
+    ) VALUES (
+      $1, $2, $3, $4, $5, $6, $7, $8, $9
+    )
   `,
 
   getTobaccoComments: () => `

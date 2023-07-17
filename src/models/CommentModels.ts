@@ -22,6 +22,20 @@ export default {
   remove: () => `
     DELETE FROM hookah.comment
     WHERE comment_id = $1    
-    RETURNING entity_type AS "entityType"
+    RETURNING *
+  `,
+
+  saveDeletedComment: () => `
+    INSERT INTO deleted.comment (
+      deleted_id,
+      comment_id,
+      user_id, 
+      entity_id, 
+      entity_type, 
+      comment_text,
+      created_at,
+      updated_at
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
   `,
 };
