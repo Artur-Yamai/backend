@@ -151,14 +151,14 @@ export default {
 
   getTobaccoComments: () => `
     SELECT 
-      comment.comment_id AS "id",
-      comment.entity_id AS "tobaccoId",
+    tobacco_comment.comment_id AS "id",
+      tobacco_comment.tobacco_id AS "tobaccoId",
       hookah.user.user_id AS "userId",
       hookah.user.login AS login,
       hookah.user.avatar_url AS "userAvatarUrl",
-      hookah.comment.comment_text AS "text"
-    FROM hookah.comment
-    INNER JOIN hookah.user ON comment.user_id = hookah.user.user_id
-    WHERE comment.entity_id = $1
+      hookah.tobacco_comment.comment_text AS "text"
+    FROM hookah.tobacco_comment
+    INNER JOIN hookah.user ON tobacco_comment.user_id = hookah.user.user_id
+    WHERE tobacco_comment.tobacco_id = $1
   `,
 };
