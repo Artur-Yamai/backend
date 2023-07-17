@@ -54,18 +54,18 @@ export const create = [
         `uploads/tobaccos/${fileName}`,
       ]);
 
-      const tobacco = queryResult.rows[0].id;
+      const tobaccoId = queryResult.rows[0].id;
 
       const message: string = "Новый табак сохранен";
       responseHandler.success(
         req,
         res,
         201,
-        `tobaccoId - ${tobacco.id} : ${message}`,
+        `tobaccoId - ${tobaccoId} : ${message}`,
         {
           success: true,
           message,
-          body: { id: tobacco.id },
+          body: { id: tobaccoId },
         }
       );
     } catch (error) {
@@ -199,6 +199,18 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
       const logText = `tobaccoId - ${id} - ${respMessage}`;
       return responseHandler.notFound(req, res, logText, respMessage);
     }
+
+    await db.query(TobaccoModels.saveDeletedTobacco(), [
+      uuidv4(),
+      tobacco.tobacco_id,
+      tobacco.tobacco_name,
+      tobacco.fabricator_id,
+      tobacco.tobacco_description,
+      tobacco.photo_url,
+      tobacco.user_id,
+      tobacco.created_at,
+      tobacco.updated_at,
+    ]);
 
     const logText = `userId - ${userId} deleted tobaccoId - ${id}`;
     responseHandler.forRemoved(req, res, logText);

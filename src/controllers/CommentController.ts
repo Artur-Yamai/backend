@@ -79,16 +79,29 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     const id = req.body.id;
     const userId = req.headers.userId;
 
+    console.log(id);
+
     const queryResult = await db.query(CommentModels.remove(), [id]);
 
     const comment = queryResult.rows[0];
 
-    if (!comment?.entityType) {
+    if (!comment?.entity_type) {
       const respMessage = "Такой комментарий не найден";
       const logText = `comment by commentId - ${id} from userId - ${userId} - ${respMessage}`;
       responseHandler.notFound(req, res, logText, respMessage);
       return;
     }
+
+    await db.query(CommentModels.saveDeletedComment(), [
+      uuidv4(),
+      comment.comment_id,
+      comment.user_id,
+      comment.entity_id,
+      comment.entity_type,
+      comment.comment_text,
+      comment.created_at,
+      comment.updated_at,
+    ]);
 
     const logText = `userId - ${userId} deleted comment for ${comment.entityType} with id = ${id}`;
     responseHandler.forRemoved(req, res, logText);
