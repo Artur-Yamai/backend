@@ -2,7 +2,7 @@ import { Router, NextFunction, Request, Response } from "express";
 import multer from "multer";
 import { checkAuth } from "../utils";
 import { ReferenceController } from "../controllers";
-import RightsCheck, { RoleCodes } from "../validations/RightsCheck";
+import { rightsCheck, RoleCodes } from "../utils";
 
 const router = Router();
 const upload: multer.Multer = multer();
@@ -13,21 +13,21 @@ router
   .post(
     checkAuth,
     (req: Request, res: Response, next: NextFunction) =>
-      RightsCheck(req, res, next, RoleCodes.admin),
+      rightsCheck(req, res, next, RoleCodes.admin),
     upload.none(),
     ReferenceController.create
   )
   .put(
     checkAuth,
     (req: Request, res: Response, next: NextFunction) =>
-      RightsCheck(req, res, next, RoleCodes.admin),
+      rightsCheck(req, res, next, RoleCodes.admin),
     upload.none(),
     ReferenceController.update
   )
   .delete(
     checkAuth,
     (req: Request, res: Response, next: NextFunction) =>
-      RightsCheck(req, res, next, RoleCodes.admin),
+      rightsCheck(req, res, next, RoleCodes.admin),
     ReferenceController.remove
   );
 

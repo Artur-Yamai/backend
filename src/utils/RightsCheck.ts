@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import db from "../models";
-import responseHandler from "../utils/responseHandler";
+import responseHandler from "./responseHandler";
 
 export enum RoleCodes {
   user = 0,
@@ -8,7 +8,7 @@ export enum RoleCodes {
   admin = 10,
 }
 
-export default async (
+export const rightsCheck = async (
   req: Request,
   res: Response,
   next: NextFunction,
