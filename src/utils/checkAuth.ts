@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
-import { jwtSectretKey } from "../secrets";
 import responseHandler from "./responseHandler";
 import { tokenDecoded } from "../helpers";
 
