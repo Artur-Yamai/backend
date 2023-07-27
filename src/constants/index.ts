@@ -1,1 +1,5 @@
-export { avatarsDirName, tobaccoDirName } from "./fileStorageDirName";
+export {
+  avatarsDirName,
+  tobaccoDirName,
+  coalDirName,
+} from "./fileStorageDirName";
