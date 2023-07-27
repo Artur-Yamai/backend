@@ -1,29 +1,16 @@
 import { Response, Request, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import db, { UserModels } from "../models";
 import { jwtSectretKey } from "../secrets";
 import { avatarsDirName } from "../constants";
-import { fileFilter } from "../utils";
+import { createFileUploader } from "../utils";
 import responseHandler from "../utils/responseHandler";
 import logger from "../logger/logger.service";
 
-const storage: multer.StorageEngine = multer.diskStorage({
-  destination: avatarsDirName,
-  filename: (_, file, cb) => {
-    const params: string[] = file.originalname.split(".");
-    const newPhotoName: string = uuidv4() + "." + params[params.length - 1];
-    cb(null, newPhotoName);
-  },
-});
-
-const upload: multer.Multer = multer({
-  storage,
-  fileFilter: fileFilter(["image/png", "image/jpeg", "image/jpg"]),
-});
+const upload = createFileUploader(avatarsDirName);
 
 export const register = async (req: Request, res: Response) => {
   try {
