@@ -114,7 +114,6 @@ export const update = [
       const userId = req.headers.userId;
 
       const { name, fabricatorId, description, id } = req.body;
-      console.log(fabricatorId);
 
       if (fileName) {
         const queryResult = await db.query(TobaccoModels.getOldPhotoUrl(), [

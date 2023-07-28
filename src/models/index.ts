@@ -5,6 +5,7 @@ import RatingModels from "./RatingModels";
 import TobaccoModels from "./TobaccoModels";
 import UserModels from "./UserModels";
 import ReferenceModels from "./ReferenceModels";
+import CoalModels from "./CoalModels";
 
 export {
   CommentModels,
@@ -13,6 +14,7 @@ export {
   TobaccoModels,
   UserModels,
   ReferenceModels,
+  CoalModels,
 };
 
 export default db;
