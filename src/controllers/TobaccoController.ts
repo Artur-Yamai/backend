@@ -4,7 +4,7 @@ import fs from "fs";
 import { tobaccoDirName } from "../constants";
 import db, { TobaccoModels } from "../models";
 import responseHandler from "../utils/responseHandler";
-import { tokenDecoded } from "../helpers";
+import { getUserIdFromToken } from "../helpers";
 import logger from "../logger/logger.service";
 import { createFileUploader } from "../utils";
 
@@ -81,16 +81,7 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
   try {
     const tobaccoId = req.params.id;
 
-    const userId: string = ((): string => {
-      const token: string | undefined = req.headers.authorization;
-      if (token) {
-        const data = tokenDecoded(token);
-        if (typeof data !== "string") {
-          return data.id;
-        }
-      }
-      return "";
-    })();
+    const userId: string | null = getUserIdFromToken(req.headers.authorization);
 
     const queryResult = await db.query(TobaccoModels.getById(), [
       tobaccoId,
