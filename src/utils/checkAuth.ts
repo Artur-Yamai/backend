@@ -1,30 +1,20 @@
-import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import responseHandler from "./responseHandler";
-import { tokenDecoded } from "../helpers";
+import { getUserIdFromToken } from "../helpers";
 
 export default (req: Request, res: Response, next: NextFunction) => {
-  const noAccessFunc = (token: string | jwt.JwtPayload) => {
-    responseHandler.exception(
-      req,
-      res,
-      403,
-      `Нет доступа: token - ${token}`,
-      "Нет доступа"
-    );
+  const token = req.headers.authorization;
+  const noAccessFunc = (token: string | null): void => {
+    const msg: string = "Нет доступа";
+    responseHandler.exception(req, res, 403, `${msg}: token - ${token}`, msg);
   };
 
-  if (!req.headers.authorization) {
-    return noAccessFunc("");
-  }
+  if (!token) return noAccessFunc(`${token}`);
 
-  const data: jwt.JwtPayload | string = tokenDecoded(req.headers.authorization);
+  const userId: string | null = getUserIdFromToken(token);
 
-  if (typeof data !== "string") {
-    req.headers.userId = data.id;
-    next();
-    return;
-  } else {
-    return noAccessFunc(data);
-  }
+  if (!userId) return noAccessFunc(token);
+
+  req.headers.userId = userId;
+  next();
 };
