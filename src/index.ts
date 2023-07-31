@@ -17,7 +17,7 @@ const app: express.Express = express();
 app.use(express.json());
 app.use("/uploads/avatars", express.static(avatarsDirName));
 app.use("/uploads/tobaccos", express.static(tobaccoDirName));
-app.use("/uploads/coal", express.static(coalDirName));
+app.use("/uploads/coals", express.static(coalDirName));
 app.use(cors());
 
 app.get("/", (req, res) => {
