@@ -104,7 +104,7 @@ export default {
         WHERE hookah.tobacco_rating.tobacco_id = $1
       ), 0) AS rating,
       (
-        SELECT COUNT(rating)
+        SELECT COUNT(value)
         FROM hookah.tobacco_rating
         WHERE hookah.tobacco_rating.tobacco_id = $1
       ) AS "ratingsQuantity",
