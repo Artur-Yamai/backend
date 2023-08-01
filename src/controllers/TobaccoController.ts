@@ -203,7 +203,6 @@ export const getTobaccoComments = async (
 ): Promise<void> => {
   try {
     const tobaccoId = req.params.id;
-    console.log(tobaccoId);
 
     const queryResult = await db.query(TobaccoModels.getTobaccoComments(), [
       tobaccoId,
