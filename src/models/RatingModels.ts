@@ -1,19 +1,19 @@
 export default {
-  add: () => `
-    INSERT INTO hookah.tobacco_rating (
+  add: (tableName: string) => `
+    INSERT INTO rating.${tableName} (
       user_id, tobacco_id, value
     ) VALUES ($1, $2, $3)
-    RETURNING tobacco_rating
+    RETURNING ${tableName}
   `,
 
-  update: () => `
-    UPDATE hookah.tobacco_rating
+  update: (tableName: string) => `
+    UPDATE rating.${tableName}
     SET value = $3
     WHERE user_id = $1 AND tobacco_id = $2
   `,
 
-  remove: () => `
-    DELETE FROM hookah.tobacco_rating
+  remove: (tableName: string) => `
+    DELETE FROM rating.${tableName}
     WHERE user_id = $1 AND tobacco_id = $2
   `,
 };

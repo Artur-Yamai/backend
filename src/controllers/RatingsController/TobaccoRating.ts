@@ -12,7 +12,7 @@ export const add = [
       const userId = req.headers.userId;
       const { tobaccoId, rating } = req.body;
 
-      const queryResult = await db.query(RatingModels.add(), [
+      const queryResult = await db.query(RatingModels.add("tobacco"), [
         userId,
         tobaccoId,
         rating,
@@ -48,7 +48,7 @@ export const update = [
       const userId = req.headers.userId;
       const { tobaccoId, rating } = req.body;
 
-      const queryResult = await db.query(RatingModels.update(), [
+      const queryResult = await db.query(RatingModels.update("tobacco"), [
         userId,
         tobaccoId,
         rating,
@@ -83,7 +83,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     const userId = req.headers.userId;
     const tobaccoId = req.body.id;
 
-    const queryResult = await db.query(RatingModels.remove(), [
+    const queryResult = await db.query(RatingModels.remove("tobacco"), [
       userId,
       tobaccoId,
     ]);
