@@ -119,7 +119,7 @@ export const update = [
         name, // $1
         fabricatorId, // $2
         description, // $3
-        fileName ? `uploads/tobaccos/${fileName}` : fileName, // $4
+        fileName ? `uploads/coals/${fileName}` : fileName, // $4
         id, // $5
         // userId, // $6
       ]);
