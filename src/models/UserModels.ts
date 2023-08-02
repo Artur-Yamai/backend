@@ -74,9 +74,9 @@ export default {
       tobacco.tobacco_name AS "name",
       (
         SELECT
-          COALESCE(ROUND(SUM(tobacco_rating.value) / COUNT(tobacco_rating.value), 1), 0)
-        FROM hookah.tobacco_rating
-        WHERE tobacco_rating.tobacco_id = tobacco.tobacco_id
+          COALESCE(ROUND(SUM(rating.tobacco.value) / COUNT(rating.tobacco.value), 1), 0)
+        FROM rating.tobacco
+        WHERE rating.tobacco.tobacco_id = tobacco.tobacco_id
       ) AS rating
     FROM hookah.favorite_tobacco
     INNER JOIN hookah.tobacco ON tobacco.tobacco_id = favorite_tobacco.tobacco_id
