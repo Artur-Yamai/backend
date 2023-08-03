@@ -11,18 +11,17 @@ export const add = async (req: Request, res: Response): Promise<void> => {
       tobaccoId,
     ]);
 
-    const ft = queryResult.rows[0];
+    const favorite = queryResult.rows[0];
 
     const message = "Табак успешно добавлен в избранное";
     responseHandler.success(
       req,
       res,
       201,
-      `faboriteTobaccoId - ${ft.id} : ${message}`,
+      `faboriteTobaccoId - ${favorite.tobaccoId} : ${message}`,
       {
         success: true,
         message,
-        body: ft,
       }
     );
   } catch (error: any) {
