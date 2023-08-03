@@ -12,32 +12,21 @@ export default {
     ) RETURNING coal_id AS id
   `,
 
-  // getAll: () => `
-  //   SELECT
-  //     coal_id AS id,
-  //     photo_url AS "photoUrl",
-  //     coal_name AS name,
-  //     fabricator.value AS fabricator,
-  //     (
-  //       SELECT
-  //         COALESCE(ROUND(SUM(value) / COUNT(tobacco_rating.value), 1), 0)
-  //       FROM hookah.tobacco_rating
-  //       WHERE coal_rating.tobacco_id = coal.coal_id
-  //     ) AS rating
-  //   FROM hookah.coal
-  //     LEFT JOIN hookah.fabricator ON hookah.coal.fabricator_id = hookah.fabricator.fabricator_id
-  //   ORDER BY name, rating
-  // `,
-
-  getAll: () => `      
+  getAll: () => `
     SELECT
       coal_id AS id,
       photo_url AS "photoUrl",
       coal_name AS name,
-      fabricator.value AS fabricator
-    FROM hookah.coal 
+      fabricator.value AS fabricator,
+      (
+        SELECT
+          COALESCE(ROUND(SUM(rating.coal.value) / COUNT(rating.coal.value), 1), 0)
+        FROM rating.coal
+        WHERE rating.coal.coal_id = hookah.coal.coal_id
+      ) AS rating
+    FROM hookah.coal
       LEFT JOIN hookah.fabricator ON hookah.coal.fabricator_id = hookah.fabricator.fabricator_id
-    ORDER BY name
+    ORDER BY name, rating
   `,
 
   getById: () => `
@@ -53,7 +42,22 @@ export default {
       coal.coal_description AS description,
       coal.photo_url AS "photoUrl",
       CONCAT(coal.created_at::text, 'Z') AS "createdAt",
-      CONCAT(coal.updated_at::text, 'Z') AS "updatedAt"
+      CONCAT(coal.updated_at::text, 'Z') AS "updatedAt",
+      COALESCE((
+        SELECT ROUND(SUM(value) / COUNT(value), 1)
+        FROM rating.coal
+        WHERE rating.coal.coal_id = $1
+      ), 0) AS rating,      
+      (
+        SELECT COUNT(value)
+        FROM rating.coal
+        WHERE rating.coal.coal_id = $1
+      ) AS "ratingsQuantity",
+      COALESCE($2 = (
+        SELECT user_id
+        FROM rating.coal
+        WHERE coal_id = $1 AND user_id = $2
+      ), false) AS "isRated"
     FROM hookah.coal
     WHERE coal.coal_id = $1      
   `,

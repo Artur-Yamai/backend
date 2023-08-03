@@ -80,7 +80,7 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
     const coalId = req.params.id;
     const userId: string | null = getUserIdFromToken(req.headers.authorization);
 
-    const queryResult = await db.query(CoalModels.getById(), [coalId]); //userId
+    const queryResult = await db.query(CoalModels.getById(), [coalId, userId]);
 
     const coal = queryResult.rows[0];
 
