@@ -1,22 +1,22 @@
-type ratingTableName = "tobacco" | "coal";
+import { ProductName } from "../types";
 
 export default {
-  add: (entityName: ratingTableName) => `
-    INSERT INTO rating.${entityName} (
-      user_id, ${entityName}_id, value
+  add: (productName: ProductName) => `
+    INSERT INTO rating.${productName} (
+      user_id, ${productName}_id, value
     ) VALUES ($1, $2, $3)
-    RETURNING ${entityName}
+    RETURNING ${productName}
   `,
 
-  update: (entityName: ratingTableName) => `
-    UPDATE rating.${entityName}
+  update: (productName: ProductName) => `
+    UPDATE rating.${productName}
     SET value = $3
-    WHERE user_id = $1 AND ${entityName}_id = $2
+    WHERE user_id = $1 AND ${productName}_id = $2
   `,
 
-  remove: (entityName: ratingTableName) => `
-    DELETE FROM rating.${entityName}
-    WHERE user_id = $1 AND ${entityName}_id = $2
+  remove: (productName: ProductName) => `
+    DELETE FROM rating.${productName}
+    WHERE user_id = $1 AND ${productName}_id = $2
     RETURNING *
   `,
 };
