@@ -17,4 +17,9 @@ router
   )
   .delete(checkAuth, FavoritesTobaccoController.removeToFavoritesTobacco);
 
+router
+  .route("/api/favorite/coal")
+  .post(checkAuth, multer().none(), FavoritesCoalController.add)
+  .delete(checkAuth, FavoritesCoalController.remove);
+
 export { router };
