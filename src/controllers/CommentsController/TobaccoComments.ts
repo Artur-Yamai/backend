@@ -7,7 +7,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   const userId = req.headers.userId;
   const { tobaccoId, text } = req.body;
   try {
-    const queryResult = await db.query(CommentModels.create(), [
+    const queryResult = await db.query(CommentModels.create("tobacco"), [
       uuidv4(),
       userId,
       tobaccoId,
@@ -51,7 +51,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     const { text, id } = req.body;
     const userId = req.headers.userId;
 
-    const queryResult = await db.query(CommentModels.update(), [
+    const queryResult = await db.query(CommentModels.update("tobacco"), [
       text,
       id,
       userId,
@@ -80,7 +80,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     const id = req.body.id;
     const userId = req.headers.userId;
 
-    const queryResult = await db.query(CommentModels.remove(), [id]);
+    const queryResult = await db.query(CommentModels.remove("tobacco"), [id]);
 
     const comment = queryResult.rows[0];
 
@@ -95,6 +95,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
       comment.comment_id,
       comment.user_id,
       comment.tobacco_id,
+      "tobacco",
       comment.comment_text,
       comment.created_at,
       comment.updated_at,
