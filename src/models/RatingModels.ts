@@ -1,19 +1,22 @@
+type ratingTableName = "tobacco" | "coal";
+
 export default {
-  add: (tableName: string) => `
-    INSERT INTO rating.${tableName} (
-      user_id, tobacco_id, value
+  add: (entityName: ratingTableName) => `
+    INSERT INTO rating.${entityName} (
+      user_id, ${entityName}_id, value
     ) VALUES ($1, $2, $3)
-    RETURNING ${tableName}
+    RETURNING ${entityName}
   `,
 
-  update: (tableName: string) => `
-    UPDATE rating.${tableName}
+  update: (entityName: ratingTableName) => `
+    UPDATE rating.${entityName}
     SET value = $3
-    WHERE user_id = $1 AND tobacco_id = $2
+    WHERE user_id = $1 AND ${entityName}_id = $2
   `,
 
-  remove: (tableName: string) => `
-    DELETE FROM rating.${tableName}
-    WHERE user_id = $1 AND tobacco_id = $2
+  remove: (entityName: ratingTableName) => `
+    DELETE FROM rating.${entityName}
+    WHERE user_id = $1 AND ${entityName}_id = $2
+    RETURNING *
   `,
 };
