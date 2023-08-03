@@ -186,5 +186,21 @@ export const getCoalComments = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  res.json({ success: true, message: "getCoalComments" });
+  try {
+    const coalId = req.params.id;
+
+    const queryResult = await db.query(CoalModels.getCoalComments(), [coalId]);
+
+    const comments = queryResult.rows;
+
+    const message: string = "Получен список комментариев";
+    responseHandler.success(req, res, 201, ``, {
+      success: true,
+      message,
+      body: comments,
+    });
+  } catch (error) {
+    const errorMessage: string = "Комментарии табака не были получены";
+    responseHandler.error(req, res, error, errorMessage);
+  }
 };

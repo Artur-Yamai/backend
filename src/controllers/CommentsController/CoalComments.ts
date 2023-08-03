@@ -5,12 +5,13 @@ import responseHandler from "../../utils/responseHandler";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   const userId = req.headers.userId;
-  const { tobaccoId, text } = req.body;
+  const { coalId, text } = req.body;
+
   try {
-    const queryResult = await db.query(CommentModels.create("tobacco"), [
+    const queryResult = await db.query(CommentModels.create("coal"), [
       uuidv4(),
       userId,
-      tobaccoId,
+      coalId,
       text,
     ]);
 
@@ -37,7 +38,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
         req,
         res,
         406,
-        `userId - ${userId} : попытка добавления более одного комментария для табака - ${tobaccoId}`,
+        `userId - ${userId} : попытка добавления более одного комментария для табака - ${coalId}`,
         message
       );
     }
@@ -51,7 +52,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     const { text, id } = req.body;
     const userId = req.headers.userId;
 
-    const queryResult = await db.query(CommentModels.update("tobacco"), [
+    const queryResult = await db.query(CommentModels.update("coal"), [
       text,
       id,
       userId,
@@ -71,7 +72,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       body: comment,
     });
   } catch (error) {
-    responseHandler.error(req, res, error, "Комментарий не был обновлен");
+    responseHandler.error(req, res, error, "Комментарий не был создан");
   }
 };
 
@@ -80,7 +81,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     const id = req.body.id;
     const userId = req.headers.userId;
 
-    const queryResult = await db.query(CommentModels.remove("tobacco"), [id]);
+    const queryResult = await db.query(CommentModels.remove("coal"), [id]);
 
     const comment = queryResult.rows[0];
 
@@ -94,8 +95,8 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
       uuidv4(), // deleted_id
       comment.comment_id,
       comment.user_id,
-      comment.tobacco_id,
-      "tobacco",
+      comment.coal_id,
+      "coal",
       comment.comment_text,
       comment.created_at,
       comment.updated_at,
@@ -104,6 +105,6 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     const logText = `userId - ${userId} удалил комментарий табака - ${id}`;
     responseHandler.forRemoved(req, res, logText);
   } catch (error) {
-    responseHandler.error(req, res, error, "Комментарий не был удален");
+    responseHandler.error(req, res, error, "Комментарий не был создан");
   }
 };
