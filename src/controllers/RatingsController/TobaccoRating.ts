@@ -19,7 +19,7 @@ export const add = [
       ]);
 
       if (queryResult.rowCount) {
-        const message = "Оценка поставлен";
+        const message = "Оценка поставлена";
         responseHandler.success(
           req,
           res,
@@ -31,7 +31,7 @@ export const add = [
           }
         );
       } else {
-        const respMessage = "Оценка не поставлен";
+        const respMessage = "Оценка не поставлена";
         const logText = `userId - ${userId} не смог поставить tobaccoId - ${tobaccoId} оценку ${rating}`;
         responseHandler.notFound(req, res, logText, respMessage);
       }
@@ -61,14 +61,14 @@ export const update = [
           req,
           res,
           201,
-          `userId - ${userId} изменил оценку у entityId - ${tobaccoId} на ${rating}`,
+          `userId - ${userId} изменил оценку у coalId - ${tobaccoId} на ${rating}`,
           {
             success: true,
             message,
           }
         );
       } else {
-        const respMessage = "Оценка не поставлен";
+        const respMessage = "Оценка не поставлена";
         const logText = `userId - ${userId} не смог изменить оценку у tobaccoId - ${tobaccoId} на ${rating}`;
         responseHandler.notFound(req, res, logText, respMessage);
       }
