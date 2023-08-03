@@ -1,13 +1,14 @@
 import express from "express";
 import cors from "cors";
-import { avatarsDirName, tobaccoDirName } from "./constants";
+import { avatarsDirName, tobaccoDirName, coalDirName } from "./constants";
 import {
   UserRouter,
   TobaccoRoutes,
   CommentRoutes,
-  favoriteTobaccoRoutes,
+  favoriteRoutes,
   ratingRoutes,
   referenceRoutes,
+  coalRouter,
 } from "./routes";
 import "./utils/PGChangeTypes";
 
@@ -16,6 +17,7 @@ const app: express.Express = express();
 app.use(express.json());
 app.use("/uploads/avatars", express.static(avatarsDirName));
 app.use("/uploads/tobaccos", express.static(tobaccoDirName));
+app.use("/uploads/coals", express.static(coalDirName));
 app.use(cors());
 
 app.get("/", (req, res) => {
@@ -25,9 +27,10 @@ app.get("/", (req, res) => {
 app.use(UserRouter);
 app.use(TobaccoRoutes);
 app.use(CommentRoutes);
-app.use(favoriteTobaccoRoutes);
+app.use(favoriteRoutes);
 app.use(ratingRoutes);
 app.use(referenceRoutes);
+app.use(coalRouter);
 
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);

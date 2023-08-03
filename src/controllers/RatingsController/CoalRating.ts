@@ -10,11 +10,11 @@ export const add = [
   async (req: Request, res: Response): Promise<void> => {
     try {
       const userId = req.headers.userId;
-      const { tobaccoId, rating } = req.body;
+      const { coalId, rating } = req.body;
 
-      const queryResult = await db.query(RatingModels.add("tobacco"), [
+      const queryResult = await db.query(RatingModels.add("coal"), [
         userId,
-        tobaccoId,
+        coalId,
         rating,
       ]);
 
@@ -24,7 +24,7 @@ export const add = [
           req,
           res,
           201,
-          `userId - ${userId} поставил tobaccoId - ${tobaccoId} оценку ${rating}`,
+          `userId - ${userId} поставил coalId - ${coalId} оценку ${rating}`,
           {
             success: true,
             message,
@@ -32,7 +32,7 @@ export const add = [
         );
       } else {
         const respMessage = "Оценка не поставлена";
-        const logText = `userId - ${userId} не смог поставить tobaccoId - ${tobaccoId} оценку ${rating}`;
+        const logText = `userId - ${userId} не смог поставить coalId - ${coalId} оценку ${rating}`;
         responseHandler.notFound(req, res, logText, respMessage);
       }
     } catch (error) {
@@ -46,11 +46,11 @@ export const update = [
   async (req: Request, res: Response): Promise<void> => {
     try {
       const userId = req.headers.userId;
-      const { tobaccoId, rating } = req.body;
+      const { coalId, rating } = req.body;
 
-      const queryResult = await db.query(RatingModels.update("tobacco"), [
+      const queryResult = await db.query(RatingModels.update("coal"), [
         userId,
-        tobaccoId,
+        coalId,
         rating,
       ]);
 
@@ -61,15 +61,15 @@ export const update = [
           req,
           res,
           201,
-          `userId - ${userId} изменил оценку у coalId - ${tobaccoId} на ${rating}`,
+          `userId - ${userId} изменил оценку у coalId - ${coalId} на ${rating}`,
           {
             success: true,
             message,
           }
         );
       } else {
-        const respMessage = "Оценка не поставлена";
-        const logText = `userId - ${userId} не смог изменить оценку у tobaccoId - ${tobaccoId} на ${rating}`;
+        const respMessage = "Оценка не поставлен";
+        const logText = `userId - ${userId} не смог изменить оценку у coalId - ${coalId} на ${rating}`;
         responseHandler.notFound(req, res, logText, respMessage);
       }
     } catch (error) {
@@ -81,18 +81,18 @@ export const update = [
 export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.headers.userId;
-    const tobaccoId = req.body.id;
+    const coalId = req.body.id;
 
-    const queryResult = await db.query(RatingModels.remove("tobacco"), [
+    const queryResult = await db.query(RatingModels.remove("coal"), [
       userId,
-      tobaccoId,
+      coalId,
     ]);
 
     if (queryResult.rowCount) {
-      const logText = `userId - ${userId} удалил оценку к табака - ${tobaccoId}`;
+      const logText = `userId - ${userId} удалил оценку к табака - ${coalId}`;
       responseHandler.forRemoved(req, res, logText);
     } else {
-      const logText = `userId - ${userId} не смог удалить оценку у tobaccoId - ${tobaccoId}`;
+      const logText = `userId - ${userId} не смог удалить оценку у coalId - ${coalId}`;
       const respMessage = "Оценка не удалена";
       responseHandler.notFound(req, res, logText, respMessage);
     }

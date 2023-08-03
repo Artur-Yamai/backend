@@ -1,19 +1,22 @@
+import { ProductName } from "../types";
+
 export default {
-  add: () => `
-    INSERT INTO hookah.tobacco_rating (
-      user_id, tobacco_id, value
+  add: (productName: ProductName) => `
+    INSERT INTO rating.${productName} (
+      user_id, ${productName}_id, value
     ) VALUES ($1, $2, $3)
-    RETURNING tobacco_rating
+    RETURNING ${productName}
   `,
 
-  update: () => `
-    UPDATE hookah.tobacco_rating
+  update: (productName: ProductName) => `
+    UPDATE rating.${productName}
     SET value = $3
-    WHERE user_id = $1 AND tobacco_id = $2
+    WHERE user_id = $1 AND ${productName}_id = $2
   `,
 
-  remove: () => `
-    DELETE FROM hookah.tobacco_rating
-    WHERE user_id = $1 AND tobacco_id = $2
+  remove: (productName: ProductName) => `
+    DELETE FROM rating.${productName}
+    WHERE user_id = $1 AND ${productName}_id = $2
+    RETURNING *
   `,
 };

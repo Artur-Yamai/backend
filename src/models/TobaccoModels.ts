@@ -20,9 +20,9 @@ export default {
       fabricator.value AS fabricator,
       (
         SELECT
-          COALESCE(ROUND(SUM(value) / COUNT(tobacco_rating.value), 1), 0)
-        FROM hookah.tobacco_rating
-        WHERE tobacco_rating.tobacco_id = tobacco.tobacco_id
+          COALESCE(ROUND(SUM(rating.tobacco.value) / COUNT(rating.tobacco.value), 1), 0)
+        FROM rating.tobacco
+        WHERE rating.tobacco.tobacco_id = hookah.tobacco.tobacco_id
       ) AS rating
     FROM hookah.tobacco 
       LEFT JOIN hookah.fabricator ON hookah.tobacco.fabricator_id = hookah.fabricator.fabricator_id
@@ -50,17 +50,17 @@ export default {
       ), false) AS "isFavorite",
       COALESCE((
         SELECT ROUND(SUM(value) / COUNT(value), 1)
-        FROM hookah.tobacco_rating
-        WHERE hookah.tobacco_rating.tobacco_id = $1
+        FROM rating.tobacco
+        WHERE rating.tobacco.tobacco_id = $1
       ), 0) AS rating,
       (
         SELECT COUNT(value)
-        FROM hookah.tobacco_rating
-        WHERE hookah.tobacco_rating.tobacco_id = $1
+        FROM rating.tobacco
+        WHERE rating.tobacco.tobacco_id = $1
       ) AS "ratingsQuantity",
       COALESCE($2 = (
         SELECT user_id
-        FROM hookah.tobacco_rating
+        FROM rating.tobacco
         WHERE tobacco_id = $1 AND user_id = $2
       ), false) AS "isRated",
       COALESCE((
@@ -100,13 +100,13 @@ export default {
       ) AS fabricator,
       COALESCE((
         SELECT ROUND(SUM(value) / COUNT(value), 1)
-        FROM hookah.tobacco_rating
-        WHERE hookah.tobacco_rating.tobacco_id = $1
+        FROM rating.tobacco
+        WHERE rating.tobacco.tobacco_id = $1
       ), 0) AS rating,
       (
-        SELECT COUNT(rating)
-        FROM hookah.tobacco_rating
-        WHERE hookah.tobacco_rating.tobacco_id = $1
+        SELECT COUNT(value)
+        FROM rating.tobacco
+        WHERE rating.tobacco.tobacco_id = $1
       ) AS "ratingsQuantity",
       tobacco.fabricator_id AS "fabricatorId",
       tobacco_description AS description,

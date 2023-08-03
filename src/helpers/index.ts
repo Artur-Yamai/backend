@@ -1,3 +1,3 @@
-import tokenDecoded from "./tokenDecoded";
+import { tokenDecoded, getUserIdFromToken } from "./tokenDecoded";
 
-export { tokenDecoded };
+export { tokenDecoded, getUserIdFromToken };

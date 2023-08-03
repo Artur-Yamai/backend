@@ -1,27 +1,14 @@
 import { Request, Response } from "express";
-import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import { tobaccoDirName } from "../constants";
-import { fileFilter } from "../utils";
 import db, { TobaccoModels } from "../models";
 import responseHandler from "../utils/responseHandler";
-import { tokenDecoded } from "../helpers";
+import { getUserIdFromToken } from "../helpers";
 import logger from "../logger/logger.service";
+import { createFileUploader } from "../utils";
 
-const storage: multer.StorageEngine = multer.diskStorage({
-  destination: tobaccoDirName,
-  filename: (_, file, cb) => {
-    const params: string[] = file.originalname.split(".");
-    const newPhotoName: string = uuidv4() + "." + params[params.length - 1];
-    cb(null, newPhotoName);
-  },
-});
-
-const upload: multer.Multer = multer({
-  storage,
-  fileFilter: fileFilter(["image/png", "image/jpeg", "image/jpg"]),
-});
+const upload = createFileUploader(tobaccoDirName);
 
 export const create = [
   upload.single("photo"),
@@ -32,7 +19,8 @@ export const create = [
       const fileName: string | undefined = req.file?.filename;
 
       if (!fileName) {
-        const message: string = "Фотография не подходят по формату";
+        const message: string =
+          "Фотография не подходят по формату или отсутсвует";
         responseHandler.exception(
           req,
           res,
@@ -93,16 +81,7 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
   try {
     const tobaccoId = req.params.id;
 
-    const userId: string = ((): string => {
-      const token: string | undefined = req.headers.authorization;
-      if (token) {
-        const data = tokenDecoded(token);
-        if (typeof data !== "string") {
-          return data.id;
-        }
-      }
-      return "";
-    })();
+    const userId: string | null = getUserIdFromToken(req.headers.authorization);
 
     const queryResult = await db.query(TobaccoModels.getById(), [
       tobaccoId,
@@ -135,7 +114,6 @@ export const update = [
       const userId = req.headers.userId;
 
       const { name, fabricatorId, description, id } = req.body;
-      console.log(fabricatorId);
 
       if (fileName) {
         const queryResult = await db.query(TobaccoModels.getOldPhotoUrl(), [
@@ -225,7 +203,6 @@ export const getTobaccoComments = async (
 ): Promise<void> => {
   try {
     const tobaccoId = req.params.id;
-    console.log(tobaccoId);
 
     const queryResult = await db.query(TobaccoModels.getTobaccoComments(), [
       tobaccoId,

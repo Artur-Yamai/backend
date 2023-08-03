@@ -1,12 +1,14 @@
+import { ProductName } from "../types";
+
 export default {
-  addToFavoritesTobacco: () => `
-    INSERT INTO hookah.favorite_tobacco (user_id, tobacco_id)
+  add: (productName: ProductName) => `
+    INSERT INTO hookah.favorite_${productName} (user_id, ${productName}_id)
     VALUES ($1, $2)
-    RETURNING user_id AS "userId", tobacco_id AS "tobaccoId"
+    RETURNING user_id AS "userId", ${productName}_id AS "${productName}Id"
   `,
 
-  removeToFavoritesTobacco: () => `
-    DELETE FROM hookah.favorite_tobacco
-    WHERE user_id = $1 AND tobacco_id = $2
+  remove: (productName: ProductName) => `
+    DELETE FROM hookah.favorite_${productName}
+    WHERE user_id = $1 AND ${productName}_id = $2
   `,
 };
