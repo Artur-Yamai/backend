@@ -111,13 +111,13 @@ export default {
     RETURNING *
   `,
 
-  saveDeletedTobacco: () => `
+  saveDeletedCoal: () => `
     INSERT INTO deleted.coal (
       deleted_id,
       coal_id,
       coal_name,
       fabricator_id,
-      tobacco_description,
+      coal_description,
       photo_url,
       user_id,
       created_at,
@@ -125,5 +125,18 @@ export default {
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9
     )
+  `,
+
+  getCoalComments: () => `      
+    SELECT 
+      coal_comment.comment_id AS "id",
+      coal_comment.coal_id AS "coalId",
+      hookah.user.user_id AS "userId",
+      hookah.user.login AS login,
+      hookah.user.avatar_url AS "userAvatarUrl",
+      hookah.coal_comment.comment_text AS "text"
+    FROM hookah.coal_comment
+    INNER JOIN hookah.user ON coal_comment.user_id = hookah.user.user_id
+    WHERE coal_comment.coal_id = $1
   `,
 };
