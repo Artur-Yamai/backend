@@ -10,12 +10,8 @@ const router = Router();
 
 router
   .route("/api/favorite/tobacco")
-  .post(
-    checkAuth,
-    multer().none(),
-    FavoritesTobaccoController.addToFavoritesTobacco
-  )
-  .delete(checkAuth, FavoritesTobaccoController.removeToFavoritesTobacco);
+  .post(checkAuth, multer().none(), FavoritesTobaccoController.add)
+  .delete(checkAuth, FavoritesTobaccoController.remove);
 
 router
   .route("/api/favorite/coal")

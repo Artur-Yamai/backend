@@ -2,17 +2,14 @@ import { Response, Request } from "express";
 import db, { FavoritesModels } from "../../models";
 import responseHandler from "../../utils/responseHandler";
 
-export const addToFavoritesTobacco = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const add = async (req: Request, res: Response): Promise<void> => {
   const { tobaccoId } = req.body;
   const userId = req.headers.userId;
   try {
-    const queryResult = await db.query(
-      FavoritesModels.addToFavoritesTobacco(),
-      [userId, tobaccoId]
-    );
+    const queryResult = await db.query(FavoritesModels.add("tobacco"), [
+      userId,
+      tobaccoId,
+    ]);
 
     const ft = queryResult.rows[0];
 
@@ -44,18 +41,15 @@ export const addToFavoritesTobacco = async (
   }
 };
 
-export const removeToFavoritesTobacco = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
     const tobaccoId = req.body.id;
     const userId = req.headers.userId;
 
-    const queryResult = await db.query(
-      FavoritesModels.removeToFavoritesTobacco(),
-      [userId, tobaccoId]
-    );
+    const queryResult = await db.query(FavoritesModels.remove("tobacco"), [
+      userId,
+      tobaccoId,
+    ]);
 
     if (queryResult.rowCount) {
       const logText = `tobaccoId - ${tobaccoId} удален из избранного у userId - ${userId}`;
