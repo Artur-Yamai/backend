@@ -76,7 +76,7 @@ export default {
         SELECT
           COALESCE(ROUND(SUM(rating.tobacco.value) / COUNT(rating.tobacco.value), 1), 0)
         FROM rating.tobacco
-        WHERE rating.tobacco.tobacco_id = tobacco.tobacco_id
+        WHERE rating.tobacco.tobacco_id = hookah.tobacco.tobacco_id
       ) AS rating
     FROM hookah.favorite_tobacco
     INNER JOIN hookah.tobacco ON tobacco.tobacco_id = favorite_tobacco.tobacco_id
