@@ -5,7 +5,7 @@ import {
   UserRouter,
   TobaccoRoutes,
   CommentRoutes,
-  favoriteTobaccoRoutes,
+  favoriteRoutes,
   ratingRoutes,
   referenceRoutes,
   coalRouter,
@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 app.use(UserRouter);
 app.use(TobaccoRoutes);
 app.use(CommentRoutes);
-app.use(favoriteTobaccoRoutes);
+app.use(favoriteRoutes);
 app.use(ratingRoutes);
 app.use(referenceRoutes);
 app.use(coalRouter);

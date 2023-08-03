@@ -1,6 +1,6 @@
 import { Response, Request } from "express";
-import db, { FavoritesModels } from "../models";
-import responseHandler from "../utils/responseHandler";
+import db, { FavoritesModels } from "../../models";
+import responseHandler from "../../utils/responseHandler";
 
 export const addToFavoritesTobacco = async (
   req: Request,
@@ -44,7 +44,10 @@ export const addToFavoritesTobacco = async (
   }
 };
 
-export const removeToFavoritesTobacco = async (req: Request, res: Response) => {
+export const removeToFavoritesTobacco = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const tobaccoId = req.body.id;
     const userId = req.headers.userId;

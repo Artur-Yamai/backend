@@ -1,12 +1,15 @@
 import { Router, Response, Request, NextFunction } from "express";
 import multer from "multer";
-import { handleValidationErrors, checkAuth } from "../utils";
-import { FavoritesTobaccoController } from "../controllers";
+import { checkAuth } from "../utils";
+import {
+  FavoritesTobaccoController,
+  FavoritesCoalController,
+} from "../controllers";
 
 const router = Router();
 
 router
-  .route("/api/favoriteTobacco")
+  .route("/api/favorite/tobacco")
   .post(
     checkAuth,
     multer().none(),
