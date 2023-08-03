@@ -57,7 +57,17 @@ export default {
         SELECT user_id
         FROM rating.coal
         WHERE coal_id = $1 AND user_id = $2
-      ), false) AS "isRated"
+      ), false) AS "isRated",
+      COALESCE($1 = (
+        SELECT coal_id
+        FROM hookah.favorite_coal
+        WHERE user_id = $2 AND coal_id = $1
+      ), false) AS "isFavorite",
+      COALESCE((
+        SELECT COUNT(coal_id)
+        FROM hookah.favorite_coal
+        WHERE favorite_coal.coal_id = $1
+      ), 0) AS "markQuantity"
     FROM hookah.coal
     WHERE coal.coal_id = $1      
   `,
