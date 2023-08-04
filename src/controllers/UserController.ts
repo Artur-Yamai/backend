@@ -288,3 +288,35 @@ export const getFavoritesTobaccoByUserId = async (
     );
   }
 };
+
+export const getFavoritesCoalByUserId = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+
+    const queryResult = await db.query(UserModels.getFavoritesCoalByUserId(), [
+      userId,
+    ]);
+
+    const coalList = queryResult.rows;
+
+    const message = "Список избранного успешно получен";
+    responseHandler.success(
+      req,
+      res,
+      201,
+      `Получен списко избранных табаков пользователя`,
+      {
+        success: true,
+        message,
+        body: coalList,
+      }
+    );
+  } catch (error) {
+    responseHandler.error(
+      req,
+      res,
+      error,
+      "Не был получен список избранных углей"
+    );
+  }
+};

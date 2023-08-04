@@ -36,4 +36,9 @@ router.get(
   UserController.getFavoritesTobaccoByUserId
 );
 
+router.get(
+  "/api/user/:id/favoriteCoals",
+  UserController.getFavoritesCoalByUserId
+);
+
 export { router };
