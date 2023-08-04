@@ -82,4 +82,20 @@ export default {
     INNER JOIN hookah.tobacco ON tobacco.tobacco_id = favorite_tobacco.tobacco_id
     WHERE favorite_tobacco.user_id = $1
   `,
+
+  getFavoritesCoalByUserId: () => `
+    SELECT
+      coal.coal_id AS "id",
+      coal.photo_url AS "photoUrl",
+      coal.coal_name AS "name",
+      (
+        SELECT
+          COALESCE(ROUND(SUM(rating.coal.value) / COUNT(rating.coal.value), 1), 0)
+        FROM rating.coal
+        WHERE rating.coal.coal_id = hookah.coal.coal_id
+      ) AS rating
+    FROM hookah.favorite_coal
+    INNER JOIN hookah.coal ON coal.coal_id = favorite_coal.coal_id
+    WHERE favorite_coal.user_id = $1
+  `,
 };
