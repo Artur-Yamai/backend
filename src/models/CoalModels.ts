@@ -127,6 +127,22 @@ export default {
     )
   `,
 
+  saveDeletedTobacco: () => `
+    INSERT INTO deleted.coal (
+      deleted_id,
+      coal_id,
+      coal_name,
+      fabricator_id,
+      coal_description,
+      photo_url,
+      user_id,
+      created_at,
+      updated_at
+    ) VALUES (
+      $1, $2, $3, $4, $5, $6, $7, $8, $9
+    )
+  `,
+
   getCoalComments: () => `      
     SELECT 
       coal_comment.comment_id AS "id",

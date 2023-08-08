@@ -163,17 +163,17 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
 
     const coal = queryResult.rows[0];
 
-    // await db.query(CoalModels.saveDeletedTobacco(), [
-    //   uuidv4(),
-    //   coal.tobacco_id,
-    //   coal.tobacco_name,
-    //   coal.fabricator_id,
-    //   coal.tobacco_description,
-    //   coal.photo_url,
-    //   coal.user_id,
-    //   coal.created_at,
-    //   coal.updated_at,
-    // ]);
+    await db.query(CoalModels.saveDeletedTobacco(), [
+      uuidv4(),
+      coal.coal_id,
+      coal.coal_name,
+      coal.fabricator_id,
+      coal.coal_description,
+      coal.photo_url,
+      coal.user_id,
+      coal.created_at,
+      coal.updated_at,
+    ]);
 
     const logText = `userId - ${userId} deleted coalId - ${id}`;
     responseHandler.forRemoved(req, res, logText);
