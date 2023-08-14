@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
+import ip from "ip";
 import { avatarsDirName, tobaccoDirName, coalDirName } from "./constants";
 import {
   UserRouter,
@@ -45,4 +46,8 @@ app.get("*", (_, res: Response) =>
   res.sendFile("/client/index.html", rootDirNameObj)
 );
 
-app.listen(port, () => console.log(`http://localhost:${port}`));
+app.listen(port, () => {
+  const IP = ip.address();
+  console.log(`http://${IP}:${port}`);
+  console.log(`http://localhost:${port}`);
+});
