@@ -1,4 +1,4 @@
-const resurce = "dist/uploads";
+const resurce = "uploads";
 
 export const avatarsDirName = `${resurce}/avatars`;
 export const tobaccoDirName = `${resurce}/tobaccos`;
