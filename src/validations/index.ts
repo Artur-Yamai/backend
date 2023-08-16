@@ -9,6 +9,7 @@ export const registerValidation = [
     min: 4,
     max: 30,
   }),
+  body("refCode", "Для регистрации необходим реферальный код").notEmpty(),
 ];
 
 export const loginValidation = [
