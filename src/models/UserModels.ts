@@ -4,10 +4,16 @@ export default {
       user_id,
       login,
       email,
-      password_hash
+      password_hash,
+      inviting_user_id
     ) VALUES (
-      $1, $2, $3, $4
-    ) RETURNING user_id AS id
+      $1, $2, $3, $4, (
+        SELECT user_id
+        FROM hookah.user
+        WHERE hookah.user.ref_code = $5
+      )
+    ) 
+    RETURNING user_id AS id
   `,
 
   auth: () => `
@@ -18,6 +24,7 @@ export default {
       password_hash AS "passwordHash",
       role_code AS "roleCode",
       avatar_url AS "avatarUrl",
+      ref_code as "refCode",
       CONCAT(created_at::text, 'Z') AS "createdAt",
       CONCAT(updated_at::text, 'Z') AS "updatedAt"
     FROM hookah.user 
@@ -32,6 +39,7 @@ export default {
       password_hash AS "passwordHash",
       role_code AS "roleCode",
       avatar_url AS "avatarUrl",
+      ref_code as "refCode",
       CONCAT(created_at::text, 'Z') AS "createdAt",
       CONCAT(updated_at::text, 'Z') AS "updatedAt"
     FROM hookah.user 

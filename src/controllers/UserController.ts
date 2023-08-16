@@ -14,7 +14,8 @@ const upload = createFileUploader(avatarsDirName);
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { email, password, login } = req.body;
+    const { email, password, login, refCode } = req.body;
+
     const salt = await bcrypt.genSalt(10);
     const passwordHash: string = await bcrypt.hash(password, salt);
 
@@ -23,6 +24,7 @@ export const register = async (req: Request, res: Response) => {
       login,
       email,
       passwordHash,
+      refCode,
     ]);
 
     responseHandler.success(
@@ -222,13 +224,40 @@ export const emailExists = async (req: Request, res: Response) => {
       `email "${email}" ${!!user ? "exist" : "not exist"}`,
       {
         success: true,
-        body: {
-          isExists: !!user,
-        },
+        body: { isExists: !!user },
       }
     );
   } catch (error) {
     responseHandler.error(req, res, error, "Email не проверен");
+  }
+};
+
+export const refCodeExist = async (req: Request, res: Response) => {
+  try {
+    const refCode = req.params.refCode;
+
+    if (!refCode) {
+      const message: string = "refCode отсутсвует";
+      responseHandler.exception(req, res, 400, message, message);
+      return;
+    }
+
+    const queryResult = await db.query(UserModels.refCodeExist(), [refCode]);
+
+    const user = queryResult.rows[0];
+
+    responseHandler.success(
+      req,
+      res,
+      200,
+      `refCode "${refCode}" ${!!user ? "exist" : "not exist"}`,
+      {
+        success: true,
+        body: { isExists: !!user },
+      }
+    );
+  } catch (error) {
+    responseHandler.error(req, res, error, "Реферальный код не проверен");
   }
 };
 
