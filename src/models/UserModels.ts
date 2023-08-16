@@ -63,9 +63,11 @@ export default {
     WHERE user_id = $1
   `,
 
-  loginExists: () => `SELECT user_id FROM hookah.user WHERE login = $1`,
+  loginExists: () => "SELECT user_id FROM hookah.user WHERE login ILIKE $1",
 
-  emailExists: () => `SELECT user_id FROM hookah.user WHERE email = $1`,
+  emailExists: () => "SELECT user_id FROM hookah.user WHERE email ILIKE $1",
+
+  refCodeExist: () => "SELECT user_id FROM hookah.user WHERE ref_code = $1",
 
   getFavoritesTobaccoByUserId: () => `
     SELECT
