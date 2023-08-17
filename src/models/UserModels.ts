@@ -1,17 +1,12 @@
 export default {
   register: () => `
-    INSERT INTO hookah.user (
+    INSERT INTO user_data.user (
       user_id,
       login,
       email,
-      password_hash,
-      inviting_user_id
+      password_hash
     ) VALUES (
-      $1, $2, $3, $4, (
-        SELECT user_id
-        FROM hookah.user
-        WHERE hookah.user.ref_code = $5
-      )
+      $1, $2, $3, $4
     ) 
     RETURNING user_id AS id
   `,
@@ -24,10 +19,9 @@ export default {
       password_hash AS "passwordHash",
       role_code AS "roleCode",
       avatar_url AS "avatarUrl",
-      ref_code as "refCode",
       CONCAT(created_at::text, 'Z') AS "createdAt",
       CONCAT(updated_at::text, 'Z') AS "updatedAt"
-    FROM hookah.user 
+    FROM user_data.user 
     WHERE login ILIKE $1
   `,
 
@@ -39,20 +33,19 @@ export default {
       password_hash AS "passwordHash",
       role_code AS "roleCode",
       avatar_url AS "avatarUrl",
-      ref_code as "refCode",
       CONCAT(created_at::text, 'Z') AS "createdAt",
       CONCAT(updated_at::text, 'Z') AS "updatedAt"
-    FROM hookah.user 
+    FROM user_data.user 
     WHERE user_id = $1
   `,
 
   saveAvatar: () => `
     WITH oldValue AS (
       SELECT avatar_url AS "avatarUrl" 
-      FROM hookah.user 
+      FROM user_data.user 
       WHERE user_id = $2
     )
-    UPDATE hookah.user 
+    UPDATE user_data.user 
     SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
     WHERE user_id = $2
     RETURNING (SELECT * FROM oldValue)
@@ -67,15 +60,16 @@ export default {
       avatar_url AS "avatarUrl",
       CONCAT(created_at::text, 'Z') AS "createdAt",
       CONCAT(updated_at::text, 'Z') AS "updatedAt"
-    FROM hookah.user
+    FROM user_data.user
     WHERE user_id = $1
   `,
 
-  loginExists: () => "SELECT user_id FROM hookah.user WHERE login ILIKE $1",
+  loginExists: () => "SELECT user_id FROM user_data.user WHERE login ILIKE $1",
 
-  emailExists: () => "SELECT user_id FROM hookah.user WHERE email ILIKE $1",
+  emailExists: () => "SELECT user_id FROM user_data.user WHERE email ILIKE $1",
 
-  refCodeExist: () => "SELECT user_id FROM hookah.user WHERE ref_code = $1",
+  refCodeExist: () =>
+    "SELECT user_id FROM user_data.referral_code WHERE code_value = $1",
 
   getFavoritesTobaccoByUserId: () => `
     SELECT

@@ -147,12 +147,12 @@ export default {
     SELECT 
       coal_comment.comment_id AS "id",
       coal_comment.coal_id AS "coalId",
-      hookah.user.user_id AS "userId",
-      hookah.user.login AS login,
-      hookah.user.avatar_url AS "userAvatarUrl",
+      user_data.user.user_id AS "userId",
+      user_data.user.login AS login,
+      user_data.user.avatar_url AS "userAvatarUrl",
       hookah.coal_comment.comment_text AS "text"
     FROM hookah.coal_comment
-    INNER JOIN hookah.user ON coal_comment.user_id = hookah.user.user_id
+    INNER JOIN user_data.user ON coal_comment.user_id = user_data.user.user_id
     WHERE coal_comment.coal_id = $1
   `,
 };
