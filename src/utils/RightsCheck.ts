@@ -20,14 +20,14 @@ export const rightsCheck = async (
     const queryResult = await db.query(
       `
         SELECT role_code AS "roleCode" 
-        FROM hookah.user 
+        FROM user_data.user 
         WHERE user_id = $1
       `,
       [userId]
     );
 
     if (!queryResult.rows[0]) {
-      const logText: string = `Пользователь ${userId} обнаружен`;
+      const logText: string = `Пользователь ${userId} не обнаружен`;
       const respMessage: string = "Уровень прав доступа не обнаружен";
       return responseHandler.notFound(req, res, logText, respMessage);
     }
