@@ -153,12 +153,12 @@ export default {
     SELECT 
     tobacco_comment.comment_id AS "id",
       tobacco_comment.tobacco_id AS "tobaccoId",
-      hookah.user.user_id AS "userId",
-      hookah.user.login AS login,
-      hookah.user.avatar_url AS "userAvatarUrl",
+      user_data.user.user_id AS "userId",
+      user_data.user.login AS login,
+      user_data.user.avatar_url AS "userAvatarUrl",
       hookah.tobacco_comment.comment_text AS "text"
     FROM hookah.tobacco_comment
-    INNER JOIN hookah.user ON tobacco_comment.user_id = hookah.user.user_id
+    INNER JOIN user_data.user ON tobacco_comment.user_id = user_data.user.user_id
     WHERE tobacco_comment.tobacco_id = $1
   `,
 };

@@ -1,50 +1,69 @@
 export default {
   register: () => `
-    INSERT INTO hookah.user (
+    INSERT INTO user_data.user (
       user_id,
       login,
       email,
       password_hash
     ) VALUES (
       $1, $2, $3, $4
-    ) RETURNING user_id AS id
+    ) 
+    RETURNING user_id AS id
+  `,
+
+  saveNewRefRelation: () => `
+    INSERT INTO user_data.referral_relation (
+      inviting_user_id,
+      invited_user_id
+    ) VALUES (
+      (
+        SELECT user_id
+        FROM user_data.referral_code
+        WHERE code_value = $1
+      ),
+      $2
+    )
   `,
 
   auth: () => `
     SELECT
-      user_id AS id,
+      user_data.user.user_id AS id,
       login,
       email,
       password_hash AS "passwordHash",
       role_code AS "roleCode",
       avatar_url AS "avatarUrl",
-      CONCAT(created_at::text, 'Z') AS "createdAt",
-      CONCAT(updated_at::text, 'Z') AS "updatedAt"
-    FROM hookah.user 
+      code_value AS "refCode",
+      CONCAT(user_data.user.created_at::text, 'Z') AS "createdAt",
+      CONCAT(user_data.user.updated_at::text, 'Z') AS "updatedAt"
+    FROM user_data.user
+    LEFT JOIN user_data.referral_code ON user_data.referral_code.user_id = user_data.user.user_id
     WHERE login ILIKE $1
   `,
 
   authById: () => `
     SELECT
-      user_id AS id,
+      user_data.user.user_id AS id,
       login,
       email,
       password_hash AS "passwordHash",
       role_code AS "roleCode",
       avatar_url AS "avatarUrl",
-      CONCAT(created_at::text, 'Z') AS "createdAt",
-      CONCAT(updated_at::text, 'Z') AS "updatedAt"
-    FROM hookah.user 
-    WHERE user_id = $1
+      code_value AS "refCode",
+      CONCAT(user_data.user.created_at::text, 'Z') AS "createdAt",
+      CONCAT(user_data.user.updated_at::text, 'Z') AS "updatedAt"
+    FROM user_data.user     
+    LEFT JOIN user_data.referral_code ON user_data.referral_code.user_id = user_data.user.user_id
+    WHERE user_data.user.user_id = $1
   `,
 
   saveAvatar: () => `
     WITH oldValue AS (
       SELECT avatar_url AS "avatarUrl" 
-      FROM hookah.user 
+      FROM user_data.user 
       WHERE user_id = $2
     )
-    UPDATE hookah.user 
+    UPDATE user_data.user 
     SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
     WHERE user_id = $2
     RETURNING (SELECT * FROM oldValue)
@@ -59,13 +78,16 @@ export default {
       avatar_url AS "avatarUrl",
       CONCAT(created_at::text, 'Z') AS "createdAt",
       CONCAT(updated_at::text, 'Z') AS "updatedAt"
-    FROM hookah.user
+    FROM user_data.user
     WHERE user_id = $1
   `,
 
-  loginExists: () => `SELECT user_id FROM hookah.user WHERE login = $1`,
+  loginExists: () => "SELECT user_id FROM user_data.user WHERE login ILIKE $1",
 
-  emailExists: () => `SELECT user_id FROM hookah.user WHERE email = $1`,
+  emailExists: () => "SELECT user_id FROM user_data.user WHERE email ILIKE $1",
+
+  refCodeExist: () =>
+    "SELECT user_id FROM user_data.referral_code WHERE code_value = $1",
 
   getFavoritesTobaccoByUserId: () => `
     SELECT

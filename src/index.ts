@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import ip from "ip";
+import chalk from "chalk";
 import { avatarsDirName, tobaccoDirName, coalDirName } from "./constants";
 import {
   UserRouter,
@@ -13,8 +14,7 @@ import {
 } from "./routes";
 import "./utils/PGChangeTypes";
 
-export const rootDirNameObj = { root: __dirname };
-
+const rootDirNameObj = { root: __dirname };
 const port: number = 6060;
 const app: express.Express = express();
 
@@ -48,6 +48,11 @@ app.get("*", (_, res: Response) =>
 
 app.listen(port, () => {
   const IP = ip.address();
-  console.log(`http://${IP}:${port}`);
-  console.log(`http://localhost:${port}`);
+  console.clear();
+
+  console.log(`
+  App running at:
+  - Local:    ${chalk.cyan(`http://${IP}:${port}`)}
+  - Network:  ${chalk.cyan(`http://localhost:${port}`)}
+  `);
 });

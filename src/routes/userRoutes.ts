@@ -26,6 +26,7 @@ router.put("/api/user/saveAvatar", checkAuth, UserController.saveAvatar);
 
 router.get("/api/user/loginExists/:login", UserController.loginExists);
 router.get("/api/user/emailExists/:email", UserController.emailExists);
+router.get("/api/user/refCodeExists/:refCode", UserController.refCodeExist);
 
 router.get("/api/user/:id", UserController.getUserById);
 
