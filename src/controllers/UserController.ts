@@ -2,13 +2,14 @@ import { Response, Request, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
-import fs from "fs";
 import db, { UserModels } from "../models";
 import { jwtSectretKey } from "../secrets";
 import { avatarsDirName } from "../constants";
-import { createFileUploader } from "../utils";
-import responseHandler from "../utils/responseHandler";
-import logger from "../logger/logger.service";
+import {
+  ResponseHandler,
+  createFileUploader,
+  deleteReplacedFile,
+} from "../utils";
 
 const upload = createFileUploader(avatarsDirName);
 
@@ -32,11 +33,11 @@ export const register = async (req: Request, res: Response) => {
 
     await db.query(UserModels.saveNewRefRelation(), [refCode, newUserId]);
 
-    responseHandler.success(req, res, 201, `userId - ${newUserId}`, {
+    ResponseHandler.success(req, res, 201, `userId - ${newUserId}`, {
       success: true,
     });
   } catch (error: any) {
-    responseHandler.error(req, res, error, "Не удалось зарегистрироваться");
+    ResponseHandler.error(req, res, error, "Не удалось зарегистрироваться");
   }
 };
 
@@ -51,7 +52,7 @@ export const auth = async (req: Request, res: Response) => {
     if (!user) {
       const respMessage: string = "Неверный логин или пароль";
       const logText = `${login} - ${respMessage}`;
-      return responseHandler.notFound(req, res, logText, respMessage);
+      return ResponseHandler.notFound(req, res, logText, respMessage);
     }
 
     const isValid: boolean = await bcrypt.compare(
@@ -61,7 +62,7 @@ export const auth = async (req: Request, res: Response) => {
 
     if (!isValid) {
       const message: string = "Неверный логин или пароль";
-      responseHandler.exception(
+      ResponseHandler.exception(
         req,
         res,
         401,
@@ -83,12 +84,12 @@ export const auth = async (req: Request, res: Response) => {
 
     delete user.passwordHash;
 
-    responseHandler.success(req, res, 200, `userId - ${user.id}`, {
+    ResponseHandler.success(req, res, 200, `userId - ${user.id}`, {
       success: true,
       data: { user, token },
     });
   } catch (error) {
-    responseHandler.error(req, res, error, "Не удалось авторизоваться");
+    ResponseHandler.error(req, res, error, "Не удалось авторизоваться");
   }
 };
 
@@ -102,17 +103,17 @@ export const authById = async (req: Request, res: Response) => {
     if (!user) {
       const respMessage: string = "Пользователь не найден";
       const logText = `userId - ${userId} : ${respMessage}`;
-      return responseHandler.notFound(req, res, logText, respMessage);
+      return ResponseHandler.notFound(req, res, logText, respMessage);
     }
 
     delete user.passwordHash;
 
-    responseHandler.success(req, res, 200, `userId - ${user.id}`, {
+    ResponseHandler.success(req, res, 200, `userId - ${user.id}`, {
       success: true,
       body: user,
     });
   } catch (error) {
-    responseHandler.error(req, res, error, "Нет доступа");
+    ResponseHandler.error(req, res, error, "Нет доступа");
   }
 };
 
@@ -132,18 +133,13 @@ export const saveAvatar = [
         userId,
       ]);
 
-      const oldAvatarUrl = queryResult.rows[0]?.avatarUrl;
+      const oldPhotoUrl = queryResult.rows[0]?.avatarUrl;
 
-      if (oldAvatarUrl) {
-        const path = "./dist/" + oldAvatarUrl;
-        fs.unlink(path, (err) => {
-          if (err) logger.error(err.message);
-        });
-      }
+      deleteReplacedFile(oldPhotoUrl);
 
       next();
     } catch (error) {
-      responseHandler.error(req, res, error, "Не удалось сохранить аватар");
+      ResponseHandler.error(req, res, error, "Не удалось сохранить аватар");
     }
   },
   authById,
@@ -159,15 +155,15 @@ export const getUserById = async (req: Request, res: Response) => {
     if (!user) {
       const respMessage: string = "Пользователь не найден";
       const logText: string = `userId - ${id} : ${respMessage}`;
-      return responseHandler.notFound(req, res, logText, respMessage);
+      return ResponseHandler.notFound(req, res, logText, respMessage);
     }
 
-    responseHandler.success(req, res, 200, `userId - ${user.id}`, {
+    ResponseHandler.success(req, res, 200, `userId - ${user.id}`, {
       success: true,
       body: user,
     });
   } catch (error) {
-    responseHandler.error(req, res, error, "Юзер не был найден");
+    ResponseHandler.error(req, res, error, "Юзер не был найден");
   }
 };
 
@@ -177,7 +173,7 @@ export const loginExists = async (req: Request, res: Response) => {
 
     if (!login) {
       const message: string = "login отсутсвует";
-      responseHandler.exception(req, res, 400, message, message);
+      ResponseHandler.exception(req, res, 400, message, message);
       return;
     }
 
@@ -185,7 +181,7 @@ export const loginExists = async (req: Request, res: Response) => {
 
     const user = queryResult.rows[0];
 
-    responseHandler.success(
+    ResponseHandler.success(
       req,
       res,
       200,
@@ -198,7 +194,7 @@ export const loginExists = async (req: Request, res: Response) => {
       }
     );
   } catch (error) {
-    responseHandler.error(req, res, error, "Логин не проверен");
+    ResponseHandler.error(req, res, error, "Логин не проверен");
   }
 };
 
@@ -208,7 +204,7 @@ export const emailExists = async (req: Request, res: Response) => {
 
     if (!email) {
       const message: string = "email отсутсвует";
-      responseHandler.exception(req, res, 400, message, message);
+      ResponseHandler.exception(req, res, 400, message, message);
       return;
     }
 
@@ -216,7 +212,7 @@ export const emailExists = async (req: Request, res: Response) => {
 
     const user = queryResult.rows[0];
 
-    responseHandler.success(
+    ResponseHandler.success(
       req,
       res,
       200,
@@ -227,7 +223,7 @@ export const emailExists = async (req: Request, res: Response) => {
       }
     );
   } catch (error) {
-    responseHandler.error(req, res, error, "Email не проверен");
+    ResponseHandler.error(req, res, error, "Email не проверен");
   }
 };
 
@@ -237,7 +233,7 @@ export const refCodeExist = async (req: Request, res: Response) => {
 
     if (!refCode) {
       const message: string = "refCode отсутсвует";
-      responseHandler.exception(req, res, 400, message, message);
+      ResponseHandler.exception(req, res, 400, message, message);
       return;
     }
 
@@ -245,7 +241,7 @@ export const refCodeExist = async (req: Request, res: Response) => {
 
     const user = queryResult.rows[0];
 
-    responseHandler.success(
+    ResponseHandler.success(
       req,
       res,
       200,
@@ -256,7 +252,7 @@ export const refCodeExist = async (req: Request, res: Response) => {
       }
     );
   } catch (error) {
-    responseHandler.error(req, res, error, "Реферальный код не проверен");
+    ResponseHandler.error(req, res, error, "Реферальный код не проверен");
   }
 };
 
@@ -270,13 +266,13 @@ export const refCodeExist = async (req: Request, res: Response) => {
 //    const comments = to get comments
 
 //     const message: string = "Получен список комментариев";
-//     responseHandler.success(req, res, 201, ``, {
+//     ResponseHandler.success(req, res, 201, ``, {
 //       success: true,
 //       message,
 //       body: comments,
 //     });
 //   } catch (error) {
-//     responseHandler.error(req, res, error, "Комментарии не получены");
+//     ResponseHandler.error(req, res, error, "Комментарии не получены");
 //   }
 // };
 
@@ -295,7 +291,7 @@ export const getFavoritesTobaccoByUserId = async (
     const tobaccoList = queryResult.rows;
 
     const message = "Список избранного успешно получен";
-    responseHandler.success(
+    ResponseHandler.success(
       req,
       res,
       201,
@@ -308,7 +304,7 @@ export const getFavoritesTobaccoByUserId = async (
       }
     );
   } catch (error) {
-    responseHandler.error(
+    ResponseHandler.error(
       req,
       res,
       error,
@@ -328,7 +324,7 @@ export const getFavoritesCoalByUserId = async (req: Request, res: Response) => {
     const coalList = queryResult.rows;
 
     const message = "Список избранного успешно получен";
-    responseHandler.success(
+    ResponseHandler.success(
       req,
       res,
       201,
@@ -340,7 +336,7 @@ export const getFavoritesCoalByUserId = async (req: Request, res: Response) => {
       }
     );
   } catch (error) {
-    responseHandler.error(
+    ResponseHandler.error(
       req,
       res,
       error,
