@@ -24,18 +24,17 @@ export const register = async (req: Request, res: Response) => {
       login,
       email,
       passwordHash,
-      refCode,
     ]);
 
-    responseHandler.success(
-      req,
-      res,
-      201,
-      `userId - ${queryResult.rows[0]?.id}`,
-      {
-        success: true,
-      }
-    );
+    const newUserId = queryResult.rows[0]?.id;
+
+    if (!newUserId) throw "Пользователь небыл создан";
+
+    await db.query(UserModels.saveNewRefRelation(), [refCode, newUserId]);
+
+    responseHandler.success(req, res, 201, `userId - ${newUserId}`, {
+      success: true,
+    });
   } catch (error: any) {
     responseHandler.error(req, res, error, "Не удалось зарегистрироваться");
   }

@@ -11,6 +11,20 @@ export default {
     RETURNING user_id AS id
   `,
 
+  saveNewRefRelation: () => `
+    INSERT INTO user_data.referral_relation (
+      inviting_user_id,
+      invited_user_id
+    ) VALUES (
+      (
+        SELECT user_id
+        FROM user_data.referral_code
+        WHERE code_value = $1
+      ),
+      $2
+    )
+  `,
+
   auth: () => `
     SELECT
       user_id AS id,
