@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import fs from "fs";
 import { tobaccoDirName } from "../constants";
 import db, { TobaccoModels } from "../models";
-import responseHandler from "../utils/responseHandler";
 import { getUserIdFromToken } from "../helpers";
-import logger from "../logger/logger.service";
-import { createFileUploader } from "../utils";
+import {
+  createFileUploader,
+  deleteReplacedFile,
+  ResponseHandler,
+} from "../utils";
 
 const upload = createFileUploader(tobaccoDirName);
 
@@ -21,7 +22,7 @@ export const create = [
       if (!fileName) {
         const message: string =
           "Фотография не подходят по формату или отсутсвует";
-        responseHandler.exception(
+        ResponseHandler.exception(
           req,
           res,
           403,
@@ -45,7 +46,7 @@ export const create = [
       const tobaccoId = queryResult.rows[0].id;
 
       const message: string = "Новый табак сохранен";
-      responseHandler.success(
+      ResponseHandler.success(
         req,
         res,
         201,
@@ -57,7 +58,7 @@ export const create = [
         }
       );
     } catch (error) {
-      responseHandler.error(req, res, error, "Табак не был создан");
+      ResponseHandler.error(req, res, error, "Табак не был создан");
     }
   },
 ];
@@ -68,12 +69,12 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 
     const tobaccos = queryResult.rows;
 
-    responseHandler.success(req, res, 201, "Получен список всех табаков", {
+    ResponseHandler.success(req, res, 201, "Получен список всех табаков", {
       success: true,
       body: tobaccos,
     });
   } catch (error) {
-    responseHandler.error(req, res, error, "Табаки небыли получены");
+    ResponseHandler.error(req, res, error, "Табаки небыли получены");
   }
 };
 
@@ -93,15 +94,15 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
     if (!tobacco) {
       const respMessage: string = "Данные отстуствуют";
       const logText: string = `tobaccoId - ${tobaccoId} : ${respMessage}`;
-      return responseHandler.notFound(req, res, logText, respMessage);
+      return ResponseHandler.notFound(req, res, logText, respMessage);
     }
 
-    responseHandler.success(req, res, 200, `tobaccoId - ${tobaccoId}`, {
+    ResponseHandler.success(req, res, 200, `tobaccoId - ${tobaccoId}`, {
       success: true,
       body: tobacco,
     });
   } catch (error) {
-    responseHandler.error(req, res, error, "Табак не был получен");
+    ResponseHandler.error(req, res, error, "Табак не был получен");
   }
 };
 
@@ -136,17 +137,12 @@ export const update = [
       if (!tobacco) {
         const logText = `tobaccoId "${id}" - не найден`;
         const respMessage = "табак не найден";
-        return responseHandler.notFound(req, res, logText, respMessage);
+        return ResponseHandler.notFound(req, res, logText, respMessage);
       }
 
-      if (oldPhotoUrl) {
-        const path = "./dist/" + oldPhotoUrl;
-        fs.unlink(path, (err) => {
-          if (err) logger.error(err.message);
-        });
-      }
+      deleteReplacedFile(oldPhotoUrl);
 
-      responseHandler.success(
+      ResponseHandler.success(
         req,
         res,
         200,
@@ -158,7 +154,7 @@ export const update = [
         }
       );
     } catch (error) {
-      responseHandler.error(req, res, error, "Табак не был обновлен");
+      ResponseHandler.error(req, res, error, "Табак не был обновлен");
     }
   },
 ];
@@ -175,7 +171,7 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     if (!tobacco) {
       const respMessage = "Такого табака нет";
       const logText = `tobaccoId - ${id} - ${respMessage}`;
-      return responseHandler.notFound(req, res, logText, respMessage);
+      return ResponseHandler.notFound(req, res, logText, respMessage);
     }
 
     await db.query(TobaccoModels.saveDeletedTobacco(), [
@@ -191,9 +187,9 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     ]);
 
     const logText = `userId - ${userId} deleted tobaccoId - ${id}`;
-    responseHandler.forRemoved(req, res, logText);
+    ResponseHandler.forRemoved(req, res, logText);
   } catch (error) {
-    responseHandler.error(req, res, error, "Табак не был удален");
+    ResponseHandler.error(req, res, error, "Табак не был удален");
   }
 };
 
@@ -211,13 +207,13 @@ export const getTobaccoComments = async (
     const comments = queryResult.rows;
 
     const message: string = "Получен список комментариев";
-    responseHandler.success(req, res, 201, ``, {
+    ResponseHandler.success(req, res, 201, ``, {
       success: true,
       message,
       body: comments,
     });
   } catch (error) {
-    responseHandler.error(
+    ResponseHandler.error(
       req,
       res,
       error,

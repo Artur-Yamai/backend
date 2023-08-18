@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import fs from "fs";
-import { createFileUploader } from "../utils";
+import {
+  ResponseHandler,
+  createFileUploader,
+  deleteReplacedFile,
+} from "../utils";
 import { coalDirName } from "../constants";
-import responseHandler from "../utils/responseHandler";
 import db, { CoalModels } from "../models";
 import { getUserIdFromToken } from "../helpers";
-import logger from "../logger/logger.service";
 
 const upload = createFileUploader(coalDirName);
 
@@ -21,7 +22,7 @@ export const create = [
       if (!fileName) {
         const message: string =
           "Фотография не подходят по формату или отсутсвует";
-        responseHandler.exception(
+        ResponseHandler.exception(
           req,
           res,
           403,
@@ -43,7 +44,7 @@ export const create = [
       const coalId = queryResult.rows[0].id;
 
       const message: string = "Новый уголь сохранен";
-      responseHandler.success(
+      ResponseHandler.success(
         req,
         res,
         201,
@@ -55,7 +56,7 @@ export const create = [
         }
       );
     } catch (error) {
-      responseHandler.error(req, res, error, "Уголь не был создан");
+      ResponseHandler.error(req, res, error, "Уголь не был создан");
     }
   },
 ];
@@ -66,12 +67,12 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 
     const coals = queryResult.rows;
 
-    responseHandler.success(req, res, 201, "Получен список всех углей", {
+    ResponseHandler.success(req, res, 201, "Получен список всех углей", {
       success: true,
       body: coals,
     });
   } catch (error) {
-    responseHandler.error(req, res, error, "Угли небыли получены");
+    ResponseHandler.error(req, res, error, "Угли небыли получены");
   }
 };
 
@@ -87,15 +88,15 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
     if (!coal) {
       const respMessage: string = "Данные отстуствуют";
       const logText: string = `coalId - ${coalId} : ${respMessage}`;
-      return responseHandler.notFound(req, res, logText, respMessage);
+      return ResponseHandler.notFound(req, res, logText, respMessage);
     }
 
-    responseHandler.success(req, res, 200, `coalId - ${coalId}`, {
+    ResponseHandler.success(req, res, 200, `coalId - ${coalId}`, {
       success: true,
       body: coal,
     });
   } catch (error) {
-    responseHandler.error(req, res, error, "Уголь небыл получены");
+    ResponseHandler.error(req, res, error, "Уголь небыл получены");
   }
 };
 
@@ -129,15 +130,12 @@ export const update = [
       if (!coal) {
         const logText = `coalId "${id}" - не найден`;
         const respMessage = "Уголь не найден";
-        return responseHandler.notFound(req, res, logText, respMessage);
+        return ResponseHandler.notFound(req, res, logText, respMessage);
       }
 
-      if (oldPhotoUrl) {
-        const path = "./dist/" + oldPhotoUrl;
-        fs.unlink(path, (err) => err && logger.error(err.message));
-      }
+      deleteReplacedFile(oldPhotoUrl);
 
-      responseHandler.success(
+      ResponseHandler.success(
         req,
         res,
         200,
@@ -149,7 +147,7 @@ export const update = [
         }
       );
     } catch (error) {
-      responseHandler.error(req, res, error, "Уголь не был обновлен");
+      ResponseHandler.error(req, res, error, "Уголь не был обновлен");
     }
   },
 ];
@@ -176,9 +174,9 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     ]);
 
     const logText = `userId - ${userId} deleted coalId - ${id}`;
-    responseHandler.forRemoved(req, res, logText);
+    ResponseHandler.forRemoved(req, res, logText);
   } catch (error) {
-    responseHandler.error(req, res, error, "Уголь не был удален");
+    ResponseHandler.error(req, res, error, "Уголь не был удален");
   }
 };
 
@@ -194,13 +192,13 @@ export const getCoalComments = async (
     const comments = queryResult.rows;
 
     const message: string = "Получен список комментариев";
-    responseHandler.success(req, res, 201, ``, {
+    ResponseHandler.success(req, res, 201, ``, {
       success: true,
       message,
       body: comments,
     });
   } catch (error) {
     const errorMessage: string = "Комментарии табака не были получены";
-    responseHandler.error(req, res, error, errorMessage);
+    ResponseHandler.error(req, res, error, errorMessage);
   }
 };
