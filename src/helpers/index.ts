@@ -1,3 +1,2 @@
-import { tokenDecoded, getUserIdFromToken } from "./tokenDecoded";
-
-export { tokenDecoded, getUserIdFromToken };
+export { tokenDecoded, getUserIdFromToken } from "./tokenDecoded";
+export { toDeleteFile } from "./toDeleteFile";
