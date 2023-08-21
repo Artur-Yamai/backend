@@ -109,7 +109,6 @@ export const update = [
 
       if (fileName) {
         const queryResult = await db.query(CoalModels.getOldPhotoUrl(), [id]);
-        console.log(queryResult.rows);
         oldPhotoUrl = queryResult.rows[0]?.photoUrl;
       }
 
