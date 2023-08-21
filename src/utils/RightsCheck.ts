@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import db from "../models";
+import db, { UserModels } from "../models";
 import responseHandler from "./responseHandler";
 
 export enum RoleCodes {
@@ -17,14 +17,7 @@ export const rightsCheck = async (
   try {
     const userId = req.headers.userId;
 
-    const queryResult = await db.query(
-      `
-        SELECT role_code AS "roleCode" 
-        FROM user_data.user 
-        WHERE user_id = $1
-      `,
-      [userId]
-    );
+    const queryResult = await db.query(UserModels.getUserRoleCode(), [userId]);
 
     if (!queryResult.rows[0]) {
       const logText: string = `Пользователь ${userId} не обнаружен`;

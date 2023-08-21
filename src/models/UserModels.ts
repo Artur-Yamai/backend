@@ -56,6 +56,12 @@ export default {
     WHERE user_data.user.user_id = $1
   `,
 
+  getUserRoleCode: () => `
+    SELECT role_code AS "roleCode" 
+    FROM user_data.user 
+    WHERE user_id = $1
+  `,
+
   saveAvatar: () => `
     WITH oldValue AS (
       SELECT avatar_url AS "avatarUrl" 
