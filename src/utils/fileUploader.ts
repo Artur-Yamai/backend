@@ -1,5 +1,4 @@
 import multer from "multer";
-import { v4 as uuidv4 } from "uuid";
 import { fileFilter } from "../utils";
 
 const createStorage = (path: string): multer.StorageEngine =>
@@ -7,7 +6,9 @@ const createStorage = (path: string): multer.StorageEngine =>
     destination: path,
     filename: (_, file, cb) => {
       const params: string[] = file.originalname.split(".");
-      const newPhotoName: string = uuidv4() + "." + params[params.length - 1];
+      const newFileName: string = Date.now() + "" + Math.random();
+      const newPhotoName: string =
+        newFileName + "." + params[params.length - 1];
       cb(null, newPhotoName);
     },
   });
