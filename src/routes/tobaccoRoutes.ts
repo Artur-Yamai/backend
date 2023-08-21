@@ -1,8 +1,12 @@
 import { Router, NextFunction, Request, Response } from "express";
 import { TobaccoController } from "../controllers";
-import { checkAuth, handleValidationErrors } from "../utils";
-import { rightsCheck, RoleCodes } from "../utils";
-import { saveTobaccoValidation } from "../validations";
+import {
+  rightsCheck,
+  RoleCodes,
+  checkAuth,
+  handleValidationErrors,
+} from "../utils";
+import { productValidation } from "../validations";
 import { createFileUploader } from "../utils";
 import { tobaccoDirName } from "../constants";
 const router = Router();
@@ -18,7 +22,7 @@ router
     (req: Request, res: Response, next: NextFunction) =>
       rightsCheck(req, res, next, RoleCodes.moderator),
     upload.single("photo"),
-    saveTobaccoValidation,
+    productValidation,
     handleValidationErrors,
     TobaccoController.create
   )
@@ -27,7 +31,7 @@ router
     (req: Request, res: Response, next: NextFunction) =>
       rightsCheck(req, res, next, RoleCodes.moderator),
     upload.single("photo"),
-    saveTobaccoValidation,
+    productValidation,
     handleValidationErrors,
     TobaccoController.update
   )

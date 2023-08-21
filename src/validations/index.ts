@@ -1,2 +1,2 @@
 export { registerValidation, loginValidation } from "./registerValidation";
-export { saveTobaccoValidation } from "./tobaccoValidation";
+export { productValidation } from "./productValidation";
