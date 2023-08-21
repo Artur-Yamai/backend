@@ -46,7 +46,6 @@ export default {
       user_data.user.user_id AS id,
       login,
       email,
-      password_hash AS "passwordHash",
       role_code AS "roleCode",
       avatar_url AS "avatarUrl",
       code_value AS "refCode",
