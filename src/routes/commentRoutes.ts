@@ -11,14 +11,14 @@ const upload: multer.Multer = multer();
 
 router
   .route("/api/comments/tobacco")
-  .post(upload.none(), checkAuth, TobaccoCommentController.create)
-  .put(upload.none(), checkAuth, TobaccoCommentController.update)
+  .post(checkAuth, upload.none(), TobaccoCommentController.create)
+  .put(checkAuth, upload.none(), TobaccoCommentController.update)
   .delete(checkAuth, TobaccoCommentController.remove);
 
 router
   .route("/api/comments/coal")
-  .post(upload.none(), checkAuth, CoalCommentController.create)
-  .put(upload.none(), checkAuth, CoalCommentController.update)
+  .post(checkAuth, upload.none(), CoalCommentController.create)
+  .put(checkAuth, upload.none(), CoalCommentController.update)
   .delete(checkAuth, CoalCommentController.remove);
 
 export { router };

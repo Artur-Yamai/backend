@@ -4,12 +4,8 @@ import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import db, { UserModels } from "../models";
 import { jwtSectretKey } from "../secrets";
-import { avatarsDirName } from "../constants";
-import { createFileUploader } from "../utils";
 import responseHandler from "../utils/responseHandler";
 import { toDeleteFile } from "../helpers";
-
-const upload = createFileUploader(avatarsDirName);
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -49,7 +45,7 @@ export const auth = async (req: Request, res: Response) => {
 
     if (!user) {
       const respMessage: string = "Неверный логин или пароль";
-      const logText = `${login} - ${respMessage}`;
+      const logText: string = `${login} - ${respMessage}`;
       return responseHandler.notFound(req, res, logText, respMessage);
     }
 
@@ -60,25 +56,14 @@ export const auth = async (req: Request, res: Response) => {
 
     if (!isValid) {
       const message: string = "Неверный логин или пароль";
-      responseHandler.exception(
-        req,
-        res,
-        401,
-        `${req.body.login} - ${message}`,
-        message
-      );
+      const logText: string = `${req.body.login} - ${message}`;
+      responseHandler.exception(req, res, 401, logText, message);
       return;
     }
 
-    const token = jwt.sign(
-      {
-        id: user.id,
-      },
-      jwtSectretKey,
-      {
-        expiresIn: "30d",
-      }
-    );
+    const token: string = jwt.sign({ id: user.id }, jwtSectretKey, {
+      expiresIn: "30d",
+    });
 
     delete user.passwordHash;
 
@@ -100,11 +85,9 @@ export const authById = async (req: Request, res: Response) => {
 
     if (!user) {
       const respMessage: string = "Пользователь не найден";
-      const logText = `userId - ${userId} : ${respMessage}`;
+      const logText: string = `userId - ${userId} : ${respMessage}`;
       return responseHandler.notFound(req, res, logText, respMessage);
     }
-
-    delete user.passwordHash;
 
     responseHandler.success(req, res, 200, `userId - ${user.id}`, {
       success: true,
@@ -116,15 +99,12 @@ export const authById = async (req: Request, res: Response) => {
 };
 
 export const saveAvatar = [
-  upload.single("photo"),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.body.id;
       const fileName = req.file?.filename;
 
-      if (!fileName) {
-        throw Error("Фото небыло сохранено");
-      }
+      if (!fileName) throw Error("Фото небыло сохранено");
 
       const queryResult = await db.query(UserModels.saveAvatar(), [
         `uploads/avatars/${fileName}`,
@@ -171,26 +151,20 @@ export const loginExists = async (req: Request, res: Response) => {
 
     if (!login) {
       const message: string = "login отсутсвует";
-      responseHandler.exception(req, res, 400, message, message);
-      return;
+      return responseHandler.exception(req, res, 400, message, message);
     }
 
     const queryResult = await db.query(UserModels.loginExists(), [login]);
 
     const user = queryResult.rows[0];
 
-    responseHandler.success(
-      req,
-      res,
-      200,
-      `login "${login}" ${!!user ? "exist" : "not exist"}`,
-      {
-        success: true,
-        body: {
-          isExists: !!user,
-        },
-      }
-    );
+    const logText: string = `login "${login}" ${
+      !!user ? "exist" : "not exist"
+    }`;
+    responseHandler.success(req, res, 200, logText, {
+      success: true,
+      body: { isExists: !!user },
+    });
   } catch (error) {
     responseHandler.error(req, res, error, "Логин не проверен");
   }
@@ -210,16 +184,13 @@ export const emailExists = async (req: Request, res: Response) => {
 
     const user = queryResult.rows[0];
 
-    responseHandler.success(
-      req,
-      res,
-      200,
-      `email "${email}" ${!!user ? "exist" : "not exist"}`,
-      {
-        success: true,
-        body: { isExists: !!user },
-      }
-    );
+    const logText: string = `email "${email}" ${
+      !!user ? "exist" : "not exist"
+    }`;
+    responseHandler.success(req, res, 200, logText, {
+      success: true,
+      body: { isExists: !!user },
+    });
   } catch (error) {
     responseHandler.error(req, res, error, "Email не проверен");
   }
@@ -227,7 +198,7 @@ export const emailExists = async (req: Request, res: Response) => {
 
 export const refCodeExist = async (req: Request, res: Response) => {
   try {
-    const refCode = req.params.refCode;
+    const refCode: string = req.params.refCode;
 
     if (!refCode) {
       const message: string = "refCode отсутсвует";
@@ -239,16 +210,13 @@ export const refCodeExist = async (req: Request, res: Response) => {
 
     const user = queryResult.rows[0];
 
-    responseHandler.success(
-      req,
-      res,
-      200,
-      `refCode "${refCode}" ${!!user ? "exist" : "not exist"}`,
-      {
-        success: true,
-        body: { isExists: !!user },
-      }
-    );
+    const logText: string = `refCode "${refCode}" ${
+      !!user ? "exist" : "not exist"
+    }`;
+    responseHandler.success(req, res, 200, logText, {
+      success: true,
+      body: { isExists: !!user },
+    });
   } catch (error) {
     responseHandler.error(req, res, error, "Реферальный код не проверен");
   }
@@ -289,25 +257,16 @@ export const getFavoritesTobaccoByUserId = async (
     const tobaccoList = queryResult.rows;
 
     const message = "Список избранного успешно получен";
-    responseHandler.success(
-      req,
-      res,
-      201,
-      `Получен списко избранных табаков пользователя`,
-      {
-        success: true,
-        message,
-        // TODO: найти как получать из БД данные сразу в нужном виде
-        body: tobaccoList,
-      }
-    );
+    const logText = "олучен списко избранных табаков пользователя";
+    responseHandler.success(req, res, 201, logText, {
+      success: true,
+      message,
+      // TODO: найти как получать из БД данные сразу в нужном виде
+      body: tobaccoList,
+    });
   } catch (error) {
-    responseHandler.error(
-      req,
-      res,
-      error,
-      "Не был получен список избранных табаков"
-    );
+    const message: string = "Не был получен список избранных табаков";
+    responseHandler.error(req, res, error, message);
   }
 };
 
@@ -322,23 +281,14 @@ export const getFavoritesCoalByUserId = async (req: Request, res: Response) => {
     const coalList = queryResult.rows;
 
     const message = "Список избранного успешно получен";
-    responseHandler.success(
-      req,
-      res,
-      201,
-      `Получен списко избранных табаков пользователя`,
-      {
-        success: true,
-        message,
-        body: coalList,
-      }
-    );
+    const logText: string = "Получен списко избранных табаков пользователя";
+    responseHandler.success(req, res, 201, logText, {
+      success: true,
+      message,
+      body: coalList,
+    });
   } catch (error) {
-    responseHandler.error(
-      req,
-      res,
-      error,
-      "Не был получен список избранных углей"
-    );
+    const logText: string = "Не был получен список избранных углей";
+    responseHandler.error(req, res, error, logText);
   }
 };
