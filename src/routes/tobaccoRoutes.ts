@@ -1,8 +1,13 @@
 import { Router, NextFunction, Request, Response } from "express";
 import { TobaccoController } from "../controllers";
-import { checkAuth } from "../utils";
+import { checkAuth, handleValidationErrors } from "../utils";
 import { rightsCheck, RoleCodes } from "../utils";
+import { saveTobaccoValidation } from "../validations";
+import { createFileUploader } from "../utils";
+import { tobaccoDirName } from "../constants";
 const router = Router();
+
+const upload = createFileUploader(tobaccoDirName);
 
 router.get("/api/tobacco/:id", TobaccoController.getById);
 router
@@ -12,12 +17,18 @@ router
     checkAuth,
     (req: Request, res: Response, next: NextFunction) =>
       rightsCheck(req, res, next, RoleCodes.moderator),
+    upload.single("photo"),
+    saveTobaccoValidation,
+    handleValidationErrors,
     TobaccoController.create
   )
   .put(
     checkAuth,
     (req: Request, res: Response, next: NextFunction) =>
       rightsCheck(req, res, next, RoleCodes.moderator),
+    upload.single("photo"),
+    saveTobaccoValidation,
+    handleValidationErrors,
     TobaccoController.update
   )
   .delete(
