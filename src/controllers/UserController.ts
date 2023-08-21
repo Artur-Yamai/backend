@@ -2,13 +2,12 @@ import { Response, Request, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
-import fs from "fs";
 import db, { UserModels } from "../models";
 import { jwtSectretKey } from "../secrets";
 import { avatarsDirName } from "../constants";
 import { createFileUploader } from "../utils";
 import responseHandler from "../utils/responseHandler";
-import logger from "../logger/logger.service";
+import { toDeleteFile } from "../helpers";
 
 const upload = createFileUploader(avatarsDirName);
 
@@ -134,12 +133,7 @@ export const saveAvatar = [
 
       const oldAvatarUrl = queryResult.rows[0]?.avatarUrl;
 
-      if (oldAvatarUrl) {
-        const path = "./dist/" + oldAvatarUrl;
-        fs.unlink(path, (err) => {
-          if (err) logger.error(err.message);
-        });
-      }
+      if (oldAvatarUrl) toDeleteFile(oldAvatarUrl);
 
       next();
     } catch (error) {

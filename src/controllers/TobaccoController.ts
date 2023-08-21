@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import fs from "fs";
 import db, { TobaccoModels } from "../models";
 import responseHandler from "../utils/responseHandler";
-import { getUserIdFromToken } from "../helpers";
-import logger from "../logger/logger.service";
+import { getUserIdFromToken, toDeleteFile } from "../helpers";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -115,12 +113,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       return responseHandler.notFound(req, res, logText, respMessage);
     }
 
-    if (oldPhotoUrl) {
-      const path = "./dist/" + oldPhotoUrl;
-      fs.unlink(path, (err) => {
-        if (err) logger.error(err.message);
-      });
-    }
+    if (oldPhotoUrl) toDeleteFile(oldPhotoUrl);
 
     const logText: string = `userId - ${userId} updated tobaccoId - ${id}`;
     const resBody = {

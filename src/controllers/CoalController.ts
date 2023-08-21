@@ -1,12 +1,10 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import fs from "fs";
 import { createFileUploader } from "../utils";
 import { coalDirName } from "../constants";
 import responseHandler from "../utils/responseHandler";
 import db, { CoalModels } from "../models";
-import { getUserIdFromToken } from "../helpers";
-import logger from "../logger/logger.service";
+import { getUserIdFromToken, toDeleteFile } from "../helpers";
 
 const upload = createFileUploader(coalDirName);
 
@@ -132,10 +130,7 @@ export const update = [
         return responseHandler.notFound(req, res, logText, respMessage);
       }
 
-      if (oldPhotoUrl) {
-        const path = "./dist/" + oldPhotoUrl;
-        fs.unlink(path, (err) => err && logger.error(err.message));
-      }
+      if (oldPhotoUrl) toDeleteFile(oldPhotoUrl);
 
       responseHandler.success(
         req,
