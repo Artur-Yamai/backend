@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import { jwtSectretKey } from "../secrets";
+import loggerService from "../logger/logger.service";
 
-export const tokenDecoded = (token: string) => {
+export const tokenDecoded = (token: string): "" | jwt.JwtPayload => {
   const tkn: string = (token || "").replace(/Bearer\s?/, "");
 
   if (!tkn) return "";
@@ -9,14 +10,13 @@ export const tokenDecoded = (token: string) => {
   try {
     const decoded: string | jwt.JwtPayload = jwt.verify(tkn, jwtSectretKey);
     return typeof decoded !== "string" ? decoded : "";
-  } catch (_) {
+  } catch (error) {
+    loggerService.error(error, tkn);
     return "";
   }
 };
 
-export const getUserIdFromToken = (
-  token: string | undefined
-): string | null => {
+export const getUserIdFromToken = (token?: string): string | null => {
   if (!token) return null;
 
   const data = tokenDecoded(token);
