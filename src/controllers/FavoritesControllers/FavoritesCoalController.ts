@@ -4,7 +4,6 @@ import responseHandler from "../../utils/responseHandler";
 
 export const add = async (req: Request, res: Response): Promise<void> => {
   const { coalId } = req.body;
-  console.log(coalId);
   const userId = req.headers.userId;
 
   try {
