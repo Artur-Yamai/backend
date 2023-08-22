@@ -1,28 +1,40 @@
 import { Router } from "express";
-import { registerValidation, loginValidation } from "../validations";
+import validations from "../validations";
 import multer from "multer";
 import { UserController } from "../controllers";
-
-import { handleValidationErrors, checkAuth } from "../utils";
+import { avatarsDirName } from "../constants";
+import {
+  createFileUploader,
+  handleValidationErrors,
+  checkAuth,
+} from "../utils";
 
 const router = Router();
 
+const upload: multer.Multer = multer();
+const avatarUpload = createFileUploader(avatarsDirName);
+
 router.post(
   "/api/user/register",
-  multer().none(),
-  registerValidation,
+  upload.none(),
+  validations.register,
   handleValidationErrors,
   UserController.register
 );
 router.post(
   "/api/user/auth",
-  multer().none(),
-  loginValidation,
+  upload.none(),
+  validations.login,
   handleValidationErrors,
   UserController.auth
 );
 router.get("/api/user/authByToken", checkAuth, UserController.authById);
-router.put("/api/user/saveAvatar", checkAuth, UserController.saveAvatar);
+router.put(
+  "/api/user/saveAvatar",
+  checkAuth,
+  avatarUpload.single("photo"),
+  UserController.saveAvatar
+);
 
 router.get("/api/user/loginExists/:login", UserController.loginExists);
 router.get("/api/user/emailExists/:email", UserController.emailExists);

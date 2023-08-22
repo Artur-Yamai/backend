@@ -46,7 +46,6 @@ export default {
       user_data.user.user_id AS id,
       login,
       email,
-      password_hash AS "passwordHash",
       role_code AS "roleCode",
       avatar_url AS "avatarUrl",
       code_value AS "refCode",
@@ -55,6 +54,12 @@ export default {
     FROM user_data.user     
     LEFT JOIN user_data.referral_code ON user_data.referral_code.user_id = user_data.user.user_id
     WHERE user_data.user.user_id = $1
+  `,
+
+  getUserRoleCode: () => `
+    SELECT role_code AS "roleCode" 
+    FROM user_data.user 
+    WHERE user_id = $1
   `,
 
   saveAvatar: () => `

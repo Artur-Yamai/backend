@@ -1,19 +1,17 @@
-import { body } from "express-validator";
+import { register, login } from "./register";
+import { saveProduct } from "./product";
+import { saveCoalComment, saveTobaccoComment } from "./comment";
+import { saveFavoriteTobacco, saveFavoriteCoal } from "./favorite";
+import { saveTobaccoRating, saveCoalRating } from "./rating";
 
-export const registerValidation = [
-  body("email", "Неверный формат почты").isEmail(),
-  body("password", "Пароль должен быть минимум 5 символов").isLength({
-    min: 5,
-  }),
-  body("login", "Логин должен содержать от 4 до 30 символов").isLength({
-    min: 4,
-    max: 30,
-  }),
-  body("refCode", "Для регистрации необходим реферальный код").notEmpty(),
-];
-
-export const loginValidation = [
-  body("password", "Пароль должен быть минимум 5 символов").isLength({
-    min: 5,
-  }),
-];
+export default {
+  register,
+  login,
+  saveCoalComment,
+  saveTobaccoComment,
+  saveProduct,
+  saveFavoriteTobacco,
+  saveFavoriteCoal,
+  saveTobaccoRating,
+  saveCoalRating,
+};

@@ -1,82 +1,63 @@
 import { Request, Response } from "express";
-import multer from "multer";
 import db, { RatingModels } from "../../models";
 import responseHandler from "../../utils/responseHandler";
 
-const upload: multer.Multer = multer();
+export const add = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.headers.userId;
+    const { coalId, rating } = req.body;
 
-export const add = [
-  upload.none(),
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      const userId = req.headers.userId;
-      const { coalId, rating } = req.body;
+    const queryResult = await db.query(RatingModels.add("coal"), [
+      userId,
+      coalId,
+      rating,
+    ]);
 
-      const queryResult = await db.query(RatingModels.add("coal"), [
-        userId,
-        coalId,
-        rating,
-      ]);
-
-      if (queryResult.rowCount) {
-        const message = "Оценка поставлена";
-        responseHandler.success(
-          req,
-          res,
-          201,
-          `userId - ${userId} поставил coalId - ${coalId} оценку ${rating}`,
-          {
-            success: true,
-            message,
-          }
-        );
-      } else {
-        const respMessage = "Оценка не поставлена";
-        const logText = `userId - ${userId} не смог поставить coalId - ${coalId} оценку ${rating}`;
-        responseHandler.notFound(req, res, logText, respMessage);
-      }
-    } catch (error) {
-      responseHandler.error(req, res, error, "Оценка не была сохранена");
+    if (queryResult.rowCount) {
+      const message: string = "Оценка поставлена";
+      const logText: string = `userId - ${userId} поставил coalId - ${coalId} оценку ${rating}`;
+      responseHandler.success(req, res, 201, logText, {
+        success: true,
+        message,
+      });
+    } else {
+      const respMessage: string = "Оценка не поставлена";
+      const logText: string = `userId - ${userId} не смог поставить coalId - ${coalId} оценку ${rating}`;
+      responseHandler.notFound(req, res, logText, respMessage);
     }
-  },
-];
+  } catch (error) {
+    responseHandler.error(req, res, error, "Оценка не была сохранена");
+  }
+};
 
-export const update = [
-  upload.none(),
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      const userId = req.headers.userId;
-      const { coalId, rating } = req.body;
+export const update = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.headers.userId;
+    const { coalId, rating } = req.body;
 
-      const queryResult = await db.query(RatingModels.update("coal"), [
-        userId,
-        coalId,
-        rating,
-      ]);
+    const queryResult = await db.query(RatingModels.update("coal"), [
+      userId,
+      coalId,
+      rating,
+    ]);
 
-      if (queryResult.rowCount) {
-        const message = "Оценка изменена";
+    if (queryResult.rowCount) {
+      const message: string = "Оценка изменена";
+      const logText: string = `userId - ${userId} изменил оценку у coalId - ${coalId} на ${rating}`;
 
-        responseHandler.success(
-          req,
-          res,
-          201,
-          `userId - ${userId} изменил оценку у coalId - ${coalId} на ${rating}`,
-          {
-            success: true,
-            message,
-          }
-        );
-      } else {
-        const respMessage = "Оценка не поставлен";
-        const logText = `userId - ${userId} не смог изменить оценку у coalId - ${coalId} на ${rating}`;
-        responseHandler.notFound(req, res, logText, respMessage);
-      }
-    } catch (error) {
-      responseHandler.error(req, res, error, "Оценка не была изменена");
+      responseHandler.success(req, res, 201, logText, {
+        success: true,
+        message,
+      });
+    } else {
+      const respMessage: string = "Оценка не поставлен";
+      const logText: string = `userId - ${userId} не смог изменить оценку у coalId - ${coalId} на ${rating}`;
+      responseHandler.notFound(req, res, logText, respMessage);
     }
-  },
-];
+  } catch (error) {
+    responseHandler.error(req, res, error, "Оценка не была изменена");
+  }
+};
 
 export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -89,11 +70,11 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     ]);
 
     if (queryResult.rowCount) {
-      const logText = `userId - ${userId} удалил оценку к табака - ${coalId}`;
+      const logText: string = `userId - ${userId} удалил оценку к табака - ${coalId}`;
       responseHandler.forRemoved(req, res, logText);
     } else {
-      const logText = `userId - ${userId} не смог удалить оценку у coalId - ${coalId}`;
-      const respMessage = "Оценка не удалена";
+      const logText: string = `userId - ${userId} не смог удалить оценку у coalId - ${coalId}`;
+      const respMessage: string = "Оценка не удалена";
       responseHandler.notFound(req, res, logText, respMessage);
     }
   } catch (error) {

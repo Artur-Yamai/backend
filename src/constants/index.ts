@@ -5,3 +5,4 @@ export {
 } from "./fileStorageDirName";
 
 export { rootDirNameObj } from "./rootDirNameObj";
+export { uuidLengthOpt } from "./uuidLengthOpt";

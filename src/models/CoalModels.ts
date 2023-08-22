@@ -32,22 +32,17 @@ export default {
   getById: () => `
     SELECT
       coal.coal_id AS "id",
-      coal.coal_name AS "name",      
-      (
-        SELECT value
-        FROM hookah.fabricator
-        WHERE fabricator.fabricator_id = coal.fabricator_id
-      ) AS fabricator,
+      coal.coal_name AS "name", 
       coal.fabricator_id AS "fabricatorId",
+      fabricator.value AS fabricator,
       coal.coal_description AS description,
-      coal.photo_url AS "photoUrl",
-      CONCAT(coal.created_at::text, 'Z') AS "createdAt",
-      CONCAT(coal.updated_at::text, 'Z') AS "updatedAt",
+      coal.photo_url AS "photoUrl",      
+      COALESCE(hookah.favorite_coal.coal_id = $1, false) AS "isFavorite",
       COALESCE((
         SELECT ROUND(SUM(value) / COUNT(value), 1)
         FROM rating.coal
         WHERE rating.coal.coal_id = $1
-      ), 0) AS rating,      
+      ), 0) AS rating, 
       (
         SELECT COUNT(value)
         FROM rating.coal
@@ -58,17 +53,16 @@ export default {
         FROM rating.coal
         WHERE coal_id = $1 AND user_id = $2
       ), false) AS "isRated",
-      COALESCE($1 = (
-        SELECT coal_id
-        FROM hookah.favorite_coal
-        WHERE user_id = $2 AND coal_id = $1
-      ), false) AS "isFavorite",
       COALESCE((
         SELECT COUNT(coal_id)
         FROM hookah.favorite_coal
         WHERE favorite_coal.coal_id = $1
-      ), 0) AS "markQuantity"
-    FROM hookah.coal
+      ), 0) AS "markQuantity",
+      CONCAT(coal.created_at::text, 'Z') AS "createdAt",
+      CONCAT(coal.updated_at::text, 'Z') AS "updatedAt"
+    FROM hookah.coal    
+    LEFT JOIN hookah.favorite_coal ON favorite_coal.coal_id = coal.coal_id
+    LEFT JOIN hookah.fabricator ON fabricator.fabricator_id = coal.fabricator_id
     WHERE coal.coal_id = $1      
   `,
 
@@ -90,17 +84,43 @@ export default {
     WHERE
       coal.coal_id = $5
     RETURNING
-      coal.coal_id AS "id",
-      coal.coal_name AS "name",      
-      (
-        SELECT value
-        FROM hookah.fabricator
-        WHERE fabricator.fabricator_id = coal.fabricator_id
-      ) AS fabricator,
-      coal.fabricator_id AS "fabricatorId",
-      coal.coal_description AS description,
-      coal.photo_url AS "photoUrl",
-      user_id AS "userId",
+    user_id AS "userId",
+    user_id AS "userId",
+    coal.coal_id AS "id",
+    coal.coal_name AS "name",  
+    coal.fabricator_id AS "fabricatorId", 
+    (
+      SELECT value
+      FROM hookah.fabricator
+      WHERE fabricator.fabricator_id = coal.fabricator_id
+    ) AS fabricator,
+    coal.coal_description AS description,
+    coal.photo_url AS "photoUrl",  
+    COALESCE($5 = (
+      SELECT coal_id
+      FROM hookah.favorite_coal
+      WHERE user_id = $6 AND coal_id = $5
+    ), false) AS "isFavorite",    
+    COALESCE((
+      SELECT ROUND(SUM(value) / COUNT(value), 1)
+      FROM rating.coal
+      WHERE rating.coal.coal_id = $5
+    ), 0) AS rating,
+    (
+      SELECT COUNT(value)
+      FROM rating.coal
+      WHERE rating.coal.coal_id = $5
+    ) AS "ratingsQuantity",
+    COALESCE($6 = (
+      SELECT user_id
+      FROM rating.coal
+      WHERE coal_id = $5 AND user_id = $6
+    ), false) AS "isRated",
+    (
+      SELECT COUNT(hookah.favorite_coal.coal_id)
+      FROM hookah.favorite_coal
+      WHERE hookah.favorite_coal.coal_id = $5
+    ) AS "markQuantity",
       CONCAT(coal.created_at::text, 'Z') AS "createdAt",
       CONCAT(coal.updated_at::text, 'Z') AS "updatedAt"
   `,
