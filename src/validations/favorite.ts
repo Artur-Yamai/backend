@@ -10,6 +10,6 @@ export const saveFavoriteTobacco = [
 ];
 
 export const saveFavoriteCoal = [
-  body("tobaccoId", "Уголь не выбран").isLength(uuidLengthOpt),
+  body("coalId", "Уголь не выбран").isLength(uuidLengthOpt),
   handleValidationErrors,
 ];
