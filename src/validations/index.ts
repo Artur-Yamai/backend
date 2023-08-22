@@ -1,6 +1,7 @@
 import { register, login } from "./register";
-import { saveCoalComment, saveTobaccoComment } from "./comment";
 import { saveProduct } from "./product";
+import { saveCoalComment, saveTobaccoComment } from "./comment";
+import { saveFavoriteTobacco, saveFavoriteCoal } from "./favorite";
 
 export default {
   register,
@@ -8,4 +9,6 @@ export default {
   saveCoalComment,
   saveTobaccoComment,
   saveProduct,
+  saveFavoriteTobacco,
+  saveFavoriteCoal,
 };
