@@ -103,7 +103,7 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       description, // $3
       fileName ? `uploads/coals/${fileName}` : fileName, // $4
       id, // $5
-      // userId, // $6
+      userId, // $6
     ]);
 
     const coal = queryResult.rows[0];

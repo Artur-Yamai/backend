@@ -32,22 +32,12 @@ export default {
   getById: () => `
     SELECT
       tobacco.tobacco_id AS "id",
-      tobacco.tobacco_name AS "name",      
-      (
-        SELECT value
-        FROM hookah.fabricator
-        WHERE fabricator.fabricator_id = tobacco.fabricator_id
-      ) AS fabricator,
+      tobacco.tobacco_name AS "name",
       tobacco.fabricator_id AS "fabricatorId",
+      fabricator.value AS fabricator,
       tobacco.tobacco_description AS description,
       tobacco.photo_url AS "photoUrl",
-      CONCAT(tobacco.created_at::text, 'Z') AS "createdAt",
-      CONCAT(tobacco.updated_at::text, 'Z') AS "updatedAt",
-      COALESCE($1 = (
-        SELECT tobacco_id
-        FROM hookah.favorite_tobacco
-        WHERE user_id = $2 AND tobacco_id = $1
-      ), false) AS "isFavorite",
+      COALESCE(hookah.favorite_tobacco.tobacco_id = $1, false) AS "isFavorite",
       COALESCE((
         SELECT ROUND(SUM(value) / COUNT(value), 1)
         FROM rating.tobacco
@@ -67,9 +57,12 @@ export default {
         SELECT COUNT(tobacco_id)
         FROM hookah.favorite_tobacco
         WHERE favorite_tobacco.tobacco_id = $1
-      ), 0) AS "markQuantity"
+      ), 0) AS "markQuantity",
+      CONCAT(tobacco.created_at::text, 'Z') AS "createdAt",
+      CONCAT(tobacco.updated_at::text, 'Z') AS "updatedAt"
     FROM hookah.tobacco
     LEFT JOIN hookah.favorite_tobacco ON favorite_tobacco.tobacco_id = tobacco.tobacco_id
+    LEFT JOIN hookah.fabricator ON fabricator.fabricator_id = tobacco.fabricator_id
     WHERE tobacco.tobacco_id = $1
   `,
 
@@ -90,41 +83,45 @@ export default {
       updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
     WHERE
       tobacco_id = $5
-    RETURNING 
+    RETURNING
+      user_id AS "userId",
       tobacco_id AS id,
       tobacco_name AS name,
+      tobacco.fabricator_id AS "fabricatorId",
       (
         SELECT value
         FROM hookah.fabricator
         WHERE fabricator.fabricator_id = tobacco.fabricator_id
       ) AS fabricator,
+      tobacco_description AS description,
+      photo_url AS "photoUrl",
+      COALESCE($5 = (
+        SELECT tobacco_id
+        FROM hookah.favorite_tobacco
+        WHERE user_id = $6 AND tobacco_id = $5
+      ), false) AS "isFavorite",
       COALESCE((
         SELECT ROUND(SUM(value) / COUNT(value), 1)
         FROM rating.tobacco
-        WHERE rating.tobacco.tobacco_id = $1
+        WHERE rating.tobacco.tobacco_id = $5
       ), 0) AS rating,
       (
         SELECT COUNT(value)
         FROM rating.tobacco
-        WHERE rating.tobacco.tobacco_id = $1
+        WHERE rating.tobacco.tobacco_id = $5
       ) AS "ratingsQuantity",
-      tobacco.fabricator_id AS "fabricatorId",
-      tobacco_description AS description,
-      photo_url AS "photoUrl",
-      user_id AS "userId",
+      COALESCE($6 = (
+        SELECT user_id
+        FROM rating.tobacco
+        WHERE tobacco_id = $5 AND user_id = $6
+      ), false) AS "isRated",
+      (
+        SELECT COUNT(hookah.favorite_tobacco.tobacco_id)
+        FROM hookah.favorite_tobacco
+        WHERE hookah.favorite_tobacco.tobacco_id = $5
+      ) AS "markQuantity",
       CONCAT(created_at::text, 'Z') AS "createdAt",
-      CONCAT(updated_at::text, 'Z') AS "updatedAt",
-    (
-      SELECT
-        COALESCE($5 = (
-          SELECT tobacco_id
-          FROM hookah.favorite_tobacco
-          WHERE user_id = $6 AND tobacco_id = $5
-        ), false) AS "isFavorite"
-      FROM hookah.tobacco
-      LEFT JOIN hookah.favorite_tobacco ON favorite_tobacco.tobacco_id = tobacco.tobacco_id
-      WHERE tobacco.tobacco_id = $5
-    ) AS "isFavorite"
+      CONCAT(updated_at::text, 'Z') AS "updatedAt"
   `,
 
   remove: () => `
