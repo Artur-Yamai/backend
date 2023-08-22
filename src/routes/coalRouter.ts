@@ -6,7 +6,7 @@ import {
   handleValidationErrors,
 } from "../utils";
 import { CoalController } from "../controllers";
-import { productValidation } from "../validations";
+import validations from "../validations";
 import { createFileUploader } from "../utils";
 import { coalDirName } from "../constants";
 
@@ -24,7 +24,7 @@ router
     (req: Request, res: Response, next: NextFunction) =>
       rightsCheck(req, res, next, RoleCodes.moderator),
     upload.single("photo"),
-    productValidation,
+    validations.saveProduct,
     handleValidationErrors,
     CoalController.create
   )
@@ -34,7 +34,7 @@ router
       rightsCheck(req, res, next, RoleCodes.moderator),
 
     upload.single("photo"),
-    productValidation,
+    validations.saveProduct,
     handleValidationErrors,
     CoalController.update
   )

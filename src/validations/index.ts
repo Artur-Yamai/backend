@@ -1,2 +1,8 @@
-export { registerValidation, loginValidation } from "./registerValidation";
-export { productValidation } from "./productValidation";
+import { register, login } from "./register";
+import { saveProduct } from "./product";
+
+export default {
+  register,
+  login,
+  saveProduct,
+};

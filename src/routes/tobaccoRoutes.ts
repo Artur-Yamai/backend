@@ -6,7 +6,7 @@ import {
   checkAuth,
   handleValidationErrors,
 } from "../utils";
-import { productValidation } from "../validations";
+import validations from "../validations";
 import { createFileUploader } from "../utils";
 import { tobaccoDirName } from "../constants";
 const router = Router();
@@ -22,7 +22,7 @@ router
     (req: Request, res: Response, next: NextFunction) =>
       rightsCheck(req, res, next, RoleCodes.moderator),
     upload.single("photo"),
-    productValidation,
+    validations.saveProduct,
     handleValidationErrors,
     TobaccoController.create
   )
@@ -31,7 +31,7 @@ router
     (req: Request, res: Response, next: NextFunction) =>
       rightsCheck(req, res, next, RoleCodes.moderator),
     upload.single("photo"),
-    productValidation,
+    validations.saveProduct,
     handleValidationErrors,
     TobaccoController.update
   )

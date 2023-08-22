@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerValidation, loginValidation } from "../validations";
+import validations from "../validations";
 import multer from "multer";
 import { UserController } from "../controllers";
 import { avatarsDirName } from "../constants";
@@ -17,14 +17,14 @@ const avatarUpload = createFileUploader(avatarsDirName);
 router.post(
   "/api/user/register",
   upload.none(),
-  registerValidation,
+  validations.register,
   handleValidationErrors,
   UserController.register
 );
 router.post(
   "/api/user/auth",
   upload.none(),
-  loginValidation,
+  validations.login,
   handleValidationErrors,
   UserController.auth
 );
