@@ -1,8 +1,6 @@
 import { body } from "express-validator";
 import { handleValidationErrors } from "../utils";
-
-// длинна строки uuid
-const uuidLengthOpt = { min: 36, max: 36 };
+import { uuidLengthOpt } from "../constants";
 
 export const saveTobaccoRating = [
   body("tobaccoId", "Оценивыемый табак не выбрана").isLength(uuidLengthOpt),

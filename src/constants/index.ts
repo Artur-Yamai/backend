@@ -3,3 +3,5 @@ export {
   tobaccoDirName,
   coalDirName,
 } from "./fileStorageDirName";
+
+export { uuidLengthOpt } from "./uuidLengthOpt";
