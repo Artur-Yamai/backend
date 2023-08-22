@@ -1,11 +1,6 @@
 import { Router, NextFunction, Request, Response } from "express";
 import { TobaccoController } from "../controllers";
-import {
-  rightsCheck,
-  RoleCodes,
-  checkAuth,
-  handleValidationErrors,
-} from "../utils";
+import { rightsCheck, RoleCodes, checkAuth } from "../utils";
 import validations from "../validations";
 import { createFileUploader } from "../utils";
 import { tobaccoDirName } from "../constants";
@@ -23,7 +18,6 @@ router
       rightsCheck(req, res, next, RoleCodes.moderator),
     upload.single("photo"),
     validations.saveProduct,
-    handleValidationErrors,
     TobaccoController.create
   )
   .put(
@@ -32,7 +26,6 @@ router
       rightsCheck(req, res, next, RoleCodes.moderator),
     upload.single("photo"),
     validations.saveProduct,
-    handleValidationErrors,
     TobaccoController.update
   )
   .delete(

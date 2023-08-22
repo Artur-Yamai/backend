@@ -1,10 +1,5 @@
 import { Router, NextFunction, Request, Response } from "express";
-import {
-  rightsCheck,
-  RoleCodes,
-  checkAuth,
-  handleValidationErrors,
-} from "../utils";
+import { rightsCheck, RoleCodes, checkAuth } from "../utils";
 import { CoalController } from "../controllers";
 import validations from "../validations";
 import { createFileUploader } from "../utils";
@@ -25,17 +20,14 @@ router
       rightsCheck(req, res, next, RoleCodes.moderator),
     upload.single("photo"),
     validations.saveProduct,
-    handleValidationErrors,
     CoalController.create
   )
   .put(
     checkAuth,
     (req: Request, res: Response, next: NextFunction) =>
       rightsCheck(req, res, next, RoleCodes.moderator),
-
     upload.single("photo"),
     validations.saveProduct,
-    handleValidationErrors,
     CoalController.update
   )
   .delete(
