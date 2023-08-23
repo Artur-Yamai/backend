@@ -96,7 +96,6 @@ export const update = async (req: Request, res: Response): Promise<void> => {
       oldPhotoUrl = queryResult.rows[0].photoUrl;
     }
 
-    console.log(name, fabricatorId, description, id);
     const queryResult = await db.query(TobaccoModels.update(), [
       name, // $1
       fabricatorId, // $2

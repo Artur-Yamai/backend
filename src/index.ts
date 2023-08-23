@@ -48,7 +48,7 @@ app.listen(port, () => {
   console.clear();
 
   console.log(`
-  App running at:
+  Server started at:
   - Local:    ${chalk.cyan(`http://${IP}:${port}`)}
   - Network:  ${chalk.cyan(`http://localhost:${port}`)}
   `);
