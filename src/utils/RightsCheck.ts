@@ -38,3 +38,9 @@ export const rightsCheck = async (
     responseHandler.error(req, res, error, "Ошибка поиска прав пользователя");
   }
 };
+
+export const toCheckForAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => rightsCheck(req, res, next, RoleCodes.admin);

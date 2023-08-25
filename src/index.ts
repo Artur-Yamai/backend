@@ -17,6 +17,7 @@ import {
   ratingRoutes,
   referenceRoutes,
   coalRouter,
+  adminUserRouter,
 } from "./routes";
 import "./utils/PGChangeTypes";
 
@@ -38,6 +39,12 @@ app.use(favoriteRoutes);
 app.use(ratingRoutes);
 app.use(referenceRoutes);
 app.use(coalRouter);
+
+app.use(adminUserRouter);
+
+app.get("/admin*", (_, res: Response) =>
+  res.sendFile("/adminpanel/index.html", rootDirNameObj)
+);
 
 app.get("*", (_, res: Response) =>
   res.sendFile("/client/index.html", rootDirNameObj)
