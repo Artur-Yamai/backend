@@ -1,8 +1,12 @@
 import { Router, NextFunction, Request, Response } from "express";
-import { rightsCheck, RoleCodes, checkAuth } from "../utils";
+import {
+  RoleChecking,
+  RoleCodes,
+  checkAuth,
+  createFileUploader,
+} from "../utils";
 import { CoalController } from "../controllers";
 import validations from "../validations";
-import { createFileUploader } from "../utils";
 import { coalDirName } from "../constants";
 
 const router = Router();
@@ -16,26 +20,19 @@ router
   .get(CoalController.getAll)
   .post(
     checkAuth,
-    (req: Request, res: Response, next: NextFunction) =>
-      rightsCheck(req, res, next, RoleCodes.moderator),
+    RoleChecking.toCheckForModerator,
     upload.single("photo"),
     validations.saveProduct,
     CoalController.create
   )
   .put(
     checkAuth,
-    (req: Request, res: Response, next: NextFunction) =>
-      rightsCheck(req, res, next, RoleCodes.moderator),
+    RoleChecking.toCheckForModerator,
     upload.single("photo"),
     validations.saveProduct,
     CoalController.update
   )
-  .delete(
-    checkAuth,
-    (req: Request, res: Response, next: NextFunction) =>
-      rightsCheck(req, res, next, RoleCodes.moderator),
-    CoalController.remove
-  );
+  .delete(checkAuth, RoleChecking.toCheckForModerator, CoalController.remove);
 
 router.get("/api/coal/:id/comments", CoalController.getCoalComments);
 

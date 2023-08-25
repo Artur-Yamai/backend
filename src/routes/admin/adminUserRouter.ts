@@ -1,14 +1,13 @@
 import { Router } from "express";
-import { checkAuth } from "../../utils";
+import { checkAuth, RoleChecking } from "../../utils";
 import { UserController } from "../../controllers";
-import { toCheckForAdmin } from "../../utils/RightsCheck";
 
 const router = Router();
 
 router.get(
   "/api/admin/user/authByToken",
   checkAuth,
-  toCheckForAdmin,
+  RoleChecking.toCheckForAdmin,
   UserController.authById
 );
 
