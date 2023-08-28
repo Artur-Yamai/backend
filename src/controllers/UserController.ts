@@ -98,6 +98,28 @@ export const authById = async (req: Request, res: Response) => {
   }
 };
 
+export const getListByAllUsers = async (req: Request, res: Response) => {
+  try {
+    const userId = req.headers.userId;
+    const queryResult = await db.query(UserModels.getListByAllUsers());
+
+    const userList = queryResult.rows;
+
+    ResponseHandler.success(
+      req,
+      res,
+      200,
+      `userId - ${userId} получил список всех пользователей`,
+      {
+        success: true,
+        body: userList,
+      }
+    );
+  } catch (error) {
+    ResponseHandler.error(req, res, error, "Список пользователей не получен");
+  }
+};
+
 export const saveAvatar = [
   async (req: Request, res: Response, next: NextFunction) => {
     try {

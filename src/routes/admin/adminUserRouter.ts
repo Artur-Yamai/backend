@@ -11,4 +11,11 @@ router.get(
   UserController.authById
 );
 
+router.get(
+  "/api/admin/userlist",
+  checkAuth,
+  RoleChecking.toCheckForAdmin,
+  UserController.getListByAllUsers
+);
+
 export { router };

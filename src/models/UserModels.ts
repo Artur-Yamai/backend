@@ -56,6 +56,22 @@ export default {
     WHERE user_data.user.user_id = $1
   `,
 
+  getListByAllUsers: () => `
+    SELECT
+      user_data.user.user_id AS id,
+      login,
+      email,
+      password_hash AS "passwordHash",
+      role_code AS "roleCode",
+      avatar_url AS "avatarUrl",
+      code_value AS "refCode",
+      CONCAT(user_data.user.created_at::text, 'Z') AS "createdAt",
+      CONCAT(user_data.user.updated_at::text, 'Z') AS "updatedAt"
+    FROM user_data.user
+    LEFT JOIN user_data.referral_code ON user_data.referral_code.user_id = user_data.user.user_id
+
+  `,
+
   getUserRoleCode: () => `
     SELECT role_code AS "roleCode" 
     FROM user_data.user 
