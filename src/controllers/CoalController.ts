@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import ResponseHandler from "../utils/responseHandler";
-import db, { CoalModels } from "../models";
+import db, { CoalModels, CommentModels, RatingModels } from "../models";
 import { getUserIdFromToken, toDeleteFile } from "../helpers";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
@@ -141,16 +141,28 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
 
     const coal = queryResult.rows[0];
 
-    await db.query(CoalModels.saveDeletedTobacco(), [
-      uuidv4(),
-      coal.coal_id,
-      coal.coal_name,
-      coal.fabricator_id,
-      coal.coal_description,
-      coal.photo_url,
-      coal.user_id,
-      coal.created_at,
-      coal.updated_at,
+    if (!coal) {
+      const respMessage = "Такого угля нет";
+      const logText = `coalId - ${id} - ${respMessage}`;
+      return ResponseHandler.notFound(req, res, logText, respMessage);
+    }
+
+    await Promise.all([
+      db.query(CommentModels.deleteCommentsForProductId("coal"), [
+        coal.coal_id,
+      ]),
+      db.query(RatingModels.deleteRatingForProductId("coal"), [coal.coal_id]),
+      db.query(CoalModels.saveDeletedTobacco(), [
+        uuidv4(),
+        coal.coal_id,
+        coal.coal_name,
+        coal.fabricator_id,
+        coal.coal_description,
+        coal.photo_url,
+        coal.user_id,
+        coal.created_at,
+        coal.updated_at,
+      ]),
     ]);
 
     const logText = `userId - ${userId} deleted coalId - ${id}`;

@@ -19,4 +19,9 @@ export default {
     WHERE user_id = $1 AND ${productName}_id = $2
     RETURNING *
   `,
+
+  deleteRatingForProductId: (productName: ProductName) => `    
+    DELETE FROM rating.${productName}
+    WHERE ${productName}_id = $1
+  `,
 };

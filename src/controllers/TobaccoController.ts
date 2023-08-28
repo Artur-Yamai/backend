@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import db, { TobaccoModels } from "../models";
+import db, { CommentModels, RatingModels, TobaccoModels } from "../models";
 import ResponseHandler from "../utils/responseHandler";
 import { getUserIdFromToken, toDeleteFile } from "../helpers";
 
@@ -142,16 +142,25 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
       return ResponseHandler.notFound(req, res, logText, respMessage);
     }
 
-    await db.query(TobaccoModels.saveDeletedTobacco(), [
-      uuidv4(),
-      tobacco.tobacco_id,
-      tobacco.tobacco_name,
-      tobacco.fabricator_id,
-      tobacco.tobacco_description,
-      tobacco.photo_url,
-      tobacco.user_id,
-      tobacco.created_at,
-      tobacco.updated_at,
+    await Promise.all([
+      db.query(CommentModels.deleteCommentsForProductId("tobacco"), [
+        tobacco.coal_id,
+      ]),
+      db.query(
+        RatingModels.deleteRatingForProductId("tobacco"),
+        tobacco.tobacco_id
+      ),
+      db.query(TobaccoModels.saveDeletedTobacco(), [
+        uuidv4(),
+        tobacco.tobacco_id,
+        tobacco.tobacco_name,
+        tobacco.fabricator_id,
+        tobacco.tobacco_description,
+        tobacco.photo_url,
+        tobacco.user_id,
+        tobacco.created_at,
+        tobacco.updated_at,
+      ]),
     ]);
 
     const logText = `userId - ${userId} deleted tobaccoId - ${id}`;
