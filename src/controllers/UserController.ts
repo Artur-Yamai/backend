@@ -314,3 +314,29 @@ export const getFavoritesCoalByUserId = async (req: Request, res: Response) => {
     ResponseHandler.error(req, res, error, logText);
   }
 };
+
+export const setRole = async (req: Request, res: Response) => {
+  const { newRole, id } = req.body;
+  try {
+    const queryResult = await db.query(UserModels.setRole(), [newRole, id]);
+
+    const userData = queryResult.rows[0];
+
+    if (userData && userData.roleCode === newRole) {
+      const logText: string = `для userId - ${id} обновлена роль на ${newRole}`;
+      ResponseHandler.success(req, res, 201, logText, {
+        success: true,
+        message: "Роль успешноизменена",
+      });
+    } else {
+      const logText: string = `для userId - ${id} не была обновлена роль на ${newRole}`;
+      ResponseHandler.success(req, res, 200, logText, {
+        success: false,
+        message: "Роль не была изменена",
+      });
+    }
+  } catch (error) {
+    const logText: string = `пользователю ${id} не удалось установить роль ${newRole}`;
+    ResponseHandler.error(req, res, error, logText);
+  }
+};

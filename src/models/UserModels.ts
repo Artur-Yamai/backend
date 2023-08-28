@@ -90,6 +90,13 @@ export default {
     RETURNING (SELECT * FROM oldValue)
   `,
 
+  setRole: () => `
+  UPDATE user_data.user 
+  SET role_code = $1
+  WHERE user_id = $2
+  RETURNING role_code AS roleCode
+  `,
+
   getUserById: () => `
     SELECT
       user_id AS id,
