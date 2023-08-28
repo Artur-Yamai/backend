@@ -1,9 +1,9 @@
 export { default as handleValidationErrors } from "./handleValidationErrors";
 export { default as checkAuth } from "./checkAuth";
 export { fileFilter } from "./fileFilter";
-import { rightsCheck, RoleCodes } from "./RightsCheck";
+import { RoleChecking, RoleCodes } from "./RoleChecking";
 export { createFileUploader } from "./fileUploader";
 export { deleteReplacedFile } from "./deleteReplacedFile";
 import ResponseHandler from "./responseHandler";
 
-export { rightsCheck, RoleCodes, ResponseHandler };
+export { RoleChecking, RoleCodes, ResponseHandler };

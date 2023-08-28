@@ -91,16 +91,16 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
       return responseHandler.notFound(req, res, logText, respMessage);
     }
 
-    await db.query(CommentModels.saveDeletedComment(), [
-      uuidv4(), // deleted_id
-      comment.comment_id,
-      comment.user_id,
-      comment.coal_id,
-      "coal",
-      comment.comment_text,
-      comment.created_at,
-      comment.updated_at,
-    ]);
+    // await db.query(CommentModels.saveDeletedComment(), [
+    //   uuidv4(), // deleted_id
+    //   comment.comment_id,
+    //   comment.user_id,
+    //   comment.coal_id,
+    //   "coal",
+    //   comment.comment_text,
+    //   comment.created_at,
+    //   comment.updated_at,
+    // ]);
 
     const logText = `userId - ${userId} удалил комментарий табака - ${id}`;
     responseHandler.forRemoved(req, res, logText);
