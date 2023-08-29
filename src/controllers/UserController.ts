@@ -322,7 +322,7 @@ export const setRole = async (req: Request, res: Response) => {
 
     const userData = queryResult.rows[0];
 
-    if (userData && userData.roleCode === newRole) {
+    if (userData && userData.roleCode == newRole) {
       const logText: string = `для userId - ${id} обновлена роль на ${newRole}`;
       ResponseHandler.success(req, res, 201, logText, {
         success: true,
