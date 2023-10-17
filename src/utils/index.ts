@@ -4,6 +4,7 @@ export { fileFilter } from "./fileFilter";
 export { createFileUploader } from "./fileUploader";
 export { deleteReplacedFile } from "./deleteReplacedFile";
 export { mailer } from "./mailer";
+export { generatePassword } from "./generatePassword";
 
 import { RoleChecking, RoleCodes } from "./RoleChecking";
 import ResponseHandler from "./responseHandler";
