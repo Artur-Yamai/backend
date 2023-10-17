@@ -1,13 +1,30 @@
 export default {
+  registerPassword: () => `
+    INSERT INTO user_data.password ( user_id, password_hash )
+    VALUES ($1, $2)
+  `,
+
+  getPasswordHashByUserId: () => `
+    SELECT password_hash AS "passwordHash" 
+    FROM user_data.password 
+    WHERE user_id = $1
+  `,
+
+  updateThePasswordSentByEmail: () => `
+    UPDATE user_data.password 
+    SET 
+      password_hash = $1,
+      updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+    WHERE user_id = $2
+    RETURNING *
+  `,
+
   register: () => `
     INSERT INTO user_data.user (
       user_id,
       login,
-      email,
-      password_hash
-    ) VALUES (
-      $1, $2, $3, $4
-    ) 
+      email
+    ) VALUES ( $1, $2, $3 ) 
     RETURNING user_id AS id
   `,
 
@@ -30,7 +47,6 @@ export default {
       user_data.user.user_id AS id,
       login,
       email,
-      password_hash AS "passwordHash",
       role_code AS "roleCode",
       avatar_url AS "avatarUrl",
       code_value AS "refCode",
@@ -61,7 +77,6 @@ export default {
       user_data.user.user_id AS id,
       login,
       email,
-      password_hash AS "passwordHash",
       role_code AS "roleCode",
       avatar_url AS "avatarUrl",
       code_value AS "refCode",
@@ -91,10 +106,10 @@ export default {
   `,
 
   setRole: () => `
-  UPDATE user_data.user 
-  SET role_code = $1
-  WHERE user_id = $2
-  RETURNING role_code AS "roleCode"
+    UPDATE user_data.user 
+    SET role_code = $1
+    WHERE user_id = $2
+    RETURNING role_code AS "roleCode"
   `,
 
   getUserById: () => `
@@ -147,5 +162,11 @@ export default {
     FROM hookah.favorite_coal
     INNER JOIN hookah.coal ON coal.coal_id = favorite_coal.coal_id
     WHERE favorite_coal.user_id = $1
+  `,
+
+  getUserByEmail: () => `
+    SELECT user_id AS id, login, email
+    FROM user_data.user
+    WHERE email ILIKE $1
   `,
 };

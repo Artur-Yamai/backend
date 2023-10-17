@@ -36,6 +36,12 @@ router.put(
   UserController.saveAvatar
 );
 
+router.post(
+  "/api/user/restorePassword",
+  upload.none(),
+  UserController.sendNewPasswordByEmail
+);
+
 router.get("/api/user/loginExists/:login", UserController.loginExists);
 router.get("/api/user/emailExists/:email", UserController.emailExists);
 router.get("/api/user/refCodeExists/:refCode", UserController.refCodeExist);
