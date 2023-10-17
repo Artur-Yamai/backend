@@ -1,29 +1,30 @@
 import nodemailer, { SentMessageInfo, SendMailOptions } from "nodemailer";
+import { mailerData } from "../secrets/mailerData";
+
+interface MailerResponse {
+  error: Error | null;
+  info: SentMessageInfo;
+}
 
 const transporter = nodemailer.createTransport(
   {
-    host: "hostname",
+    host: mailerData.host,
     port: 465,
     secure: true,
     auth: {
-      user: "mail@mail.com",
-      pass: "pass",
+      user: mailerData.auth.user,
+      pass: mailerData.auth.pass,
     },
   },
-  {
-    from: "Mail Test <hookahdb@mail.ru>",
-  }
+  { from: "HookahDB <hookahdb@mail.ru>" }
 );
 
-export const mailer = (message: SendMailOptions): void => {
+export const mailer = (message: SendMailOptions): MailerResponse => {
+  let response: MailerResponse = { error: null, info: "" };
   transporter.sendMail(
     message,
-    (error: Error | null, info: SentMessageInfo): void => {
-      if (error) {
-        return console.log(error);
-      }
-
-      console.log("Email send: ", info);
-    }
+    (error: Error | null, info: SentMessageInfo) => (response = { error, info })
   );
+
+  return response;
 };
