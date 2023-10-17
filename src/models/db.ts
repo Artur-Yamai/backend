@@ -1,10 +1,12 @@
 import pg from "pg";
+import { dbData } from "../secrets";
 
-// данные не настоящие
-export default new pg.Pool({
-  user: "user",
-  password: "password",
-  host: "localhost",
-  port: 0,
-  database: "database",
+const db: pg.Pool = new pg.Pool({
+  user: dbData.user,
+  password: dbData.password,
+  host: dbData.host,
+  port: dbData.port,
+  database: dbData.database,
 });
+
+export default db;

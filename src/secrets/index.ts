@@ -4,3 +4,4 @@
 
 export { jwtSectretKey } from "./jwtSectretKey";
 export { mailerData } from "../secrets/mailerData";
+export { dbData } from "./dbData";
