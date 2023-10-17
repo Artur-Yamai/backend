@@ -1,11 +1,16 @@
 import { Response, Request, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import ip from "ip";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import db, { UserModels } from "../models";
 import { jwtSectretKey } from "../secrets";
 import ResponseHandler from "../utils/responseHandler";
 import { toDeleteFile } from "../helpers";
+import { generatePassword, mailer } from "../utils";
+import { PORT } from "../constants";
+
+const IP = ip.address();
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -13,12 +18,11 @@ export const register = async (req: Request, res: Response) => {
 
     const salt = await bcrypt.genSalt(10);
     const passwordHash: string = await bcrypt.hash(password, salt);
+    const userId = uuidv4();
 
-    const queryResult = await db.query(UserModels.register(), [
-      uuidv4(),
-      login,
-      email,
-      passwordHash,
+    const [queryResult] = await Promise.all([
+      db.query(UserModels.register(), [userId, login, email]),
+      db.query(UserModels.registerPassword(), [userId, passwordHash]),
     ]);
 
     const newUserId = queryResult.rows[0]?.id;
@@ -49,9 +53,16 @@ export const auth = async (req: Request, res: Response) => {
       return ResponseHandler.notFound(req, res, logText, respMessage);
     }
 
+    const PasswordQueryResult = await db.query(
+      UserModels.getPasswordHashByUserId(),
+      [user.id]
+    );
+
+    const passwordHash = PasswordQueryResult.rows[0].passwordHash;
+
     const isValid: boolean = await bcrypt.compare(
       req.body.password,
-      user.passwordHash
+      passwordHash
     );
 
     if (!isValid) {
@@ -62,10 +73,8 @@ export const auth = async (req: Request, res: Response) => {
     }
 
     const token: string = jwt.sign({ id: user.id }, jwtSectretKey, {
-      expiresIn: "30d",
+      expiresIn: "60d",
     });
-
-    delete user.passwordHash;
 
     ResponseHandler.success(req, res, 200, `userId - ${user.id}`, {
       success: true,
@@ -337,6 +346,61 @@ export const setRole = async (req: Request, res: Response) => {
     }
   } catch (error) {
     const logText: string = `пользователю ${id} не удалось установить роль ${newRole}`;
+    ResponseHandler.error(req, res, error, logText);
+  }
+};
+
+export const sendNewPasswordByEmail = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  try {
+    const queryResult = await db.query(UserModels.getUserByEmail(), [email]);
+    const userData = queryResult.rows[0];
+
+    if (userData) {
+      const newPassword: string = generatePassword();
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash: string = await bcrypt.hash(newPassword, salt);
+
+      const queryResult = await db.query(
+        UserModels.updateThePasswordSentByEmail(),
+        [passwordHash, userData.id]
+      );
+
+      if (queryResult.rows[0]) {
+        const logText: string = "user finded";
+        mailer({
+          subject: `Новый пароль`,
+          html: `
+          <div>
+            <p>Новый пароль - <b style="font-size:20px">${newPassword}</b> </p>
+            <p 
+              style="
+                border-bottom: 1px solid gray;
+                padding-bottom: 8px;
+              "
+            >Переход на сайт - <a href="${IP}:${PORT}">HookahDB</a> </p>
+            <p>Если это Вы не понимаете что это за сообщение и для кого оно, то просто проигнорируйте его.</p>
+          </div>
+          `,
+          to: userData.email,
+        });
+
+        ResponseHandler.success(req, res, 200, logText, {
+          success: true,
+          body: userData,
+        });
+      } else {
+        const message: string = "Пароль не был изменен";
+        ResponseHandler.exception(req, res, 404, message, message);
+      }
+    } else {
+      const message: string = "Пользователь с такой почтой небыл найден";
+
+      ResponseHandler.exception(req, res, 404, message, message);
+    }
+  } catch (error) {
+    const logText: string = `Не удалось отправить новый пароль на email ${email}`;
     ResponseHandler.error(req, res, error, logText);
   }
 };

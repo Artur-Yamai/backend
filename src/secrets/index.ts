@@ -3,3 +3,4 @@
 // Эти нужны чтобы приложение не крашнулось
 
 export { jwtSectretKey } from "./jwtSectretKey";
+export { mailerData } from "../secrets/mailerData";

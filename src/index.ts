@@ -7,6 +7,7 @@ import {
   tobaccoDirName,
   coalDirName,
   rootDirNameObj,
+  PORT,
 } from "./constants";
 import {
   technicalRouter,
@@ -21,7 +22,6 @@ import {
 } from "./routes";
 import "./utils/PGChangeTypes";
 
-const port: number = 6060;
 const app: express.Express = express();
 
 app.use(express.json());
@@ -50,13 +50,13 @@ app.get("*", (_, res: Response) =>
   res.sendFile("/client/index.html", rootDirNameObj)
 );
 
-app.listen(port, () => {
+app.listen(PORT, () => {
   const IP = ip.address();
   console.clear();
 
   console.log(`
   Server started at:
-  - Local:    ${chalk.cyan(`http://${IP}:${port}`)}
-  - Network:  ${chalk.cyan(`http://localhost:${port}`)}
+  - Local:    ${chalk.cyan(`http://${IP}:${PORT}`)}
+  - Network:  ${chalk.cyan(`http://localhost:${PORT}`)}
   `);
 });
