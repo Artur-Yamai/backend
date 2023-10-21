@@ -61,7 +61,7 @@ export default {
       CONCAT(tobacco.created_at::text, 'Z') AS "createdAt",
       CONCAT(tobacco.updated_at::text, 'Z') AS "updatedAt"
     FROM hookah.tobacco
-    LEFT JOIN hookah.favorite_tobacco ON favorite_tobacco.tobacco_id = tobacco.tobacco_id
+    LEFT JOIN hookah.favorite_tobacco ON (favorite_tobacco.tobacco_id = tobacco.tobacco_id AND favorite_tobacco.user_id = $2)
     LEFT JOIN hookah.fabricator ON fabricator.fabricator_id = tobacco.fabricator_id
     WHERE tobacco.tobacco_id = $1
   `,

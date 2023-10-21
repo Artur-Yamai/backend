@@ -61,7 +61,7 @@ export default {
       CONCAT(coal.created_at::text, 'Z') AS "createdAt",
       CONCAT(coal.updated_at::text, 'Z') AS "updatedAt"
     FROM hookah.coal    
-    LEFT JOIN hookah.favorite_coal ON favorite_coal.coal_id = coal.coal_id
+    LEFT JOIN hookah.favorite_coal ON (favorite_coal.coal_id = coal.coal_id AND favorite_coal.user_id = $2)
     LEFT JOIN hookah.fabricator ON fabricator.fabricator_id = coal.fabricator_id
     WHERE coal.coal_id = $1      
   `,
