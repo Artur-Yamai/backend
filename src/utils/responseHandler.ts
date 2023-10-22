@@ -4,7 +4,16 @@ import logger from "../logger/logger.service";
 
 export default class ResponseHandler {
   public static forRemoved(req: Request, res: Response, logText: string): void {
-    logger.log(this.getMethod("delete"), req.path, `\t${logText}`);
+    if (process.env.NODE_ENV === "production") {
+      logger.logToFile("info", {
+        path: req.method,
+        method: "delete",
+        message: logText,
+      });
+    } else {
+      logger.log(this.getMethod(req.method), req.path, `\t${logText}`);
+    }
+
     res.status(204).json();
   }
 
@@ -25,7 +34,17 @@ export default class ResponseHandler {
     body: any
   ): void {
     const method = this.getMethod(req.method.toLowerCase());
-    logger.log(method, req.path, `\t${logText}`);
+
+    if (process.env.NODE_ENV == "production") {
+      logger.logToFile("info", {
+        path: req.path,
+        method: req.method,
+        message: logText,
+        statusCode,
+      });
+    } else {
+      logger.log(method, req.path, `\t${logText}`);
+    }
 
     res.status(statusCode).json({ ...body });
   }
@@ -38,7 +57,18 @@ export default class ResponseHandler {
     message: string = ""
   ): void {
     let method = this.getMethod(req.method.toLowerCase());
-    logger.warn(method, req.path, `\t${exceptionText}`);
+
+    if (process.env.NODE_ENV === "production") {
+      logger.logToFile("warn", {
+        path: req.path,
+        method: req.method,
+        message: message,
+        statusCode: statusCode,
+      });
+    } else {
+      logger.warn(method, req.path, `\t${exceptionText}`);
+    }
+
     res.status(statusCode).json({
       success: false,
       message,
@@ -53,29 +83,39 @@ export default class ResponseHandler {
   ): void {
     const message: string = `SERVER ERROR: ${text}`;
     let method = this.getMethod(req.method.toLowerCase());
-    logger.error(method, req.path, `\t${message} \n`, error);
+
+    if (process.env.NODE_ENV === "production") {
+      logger.logToFile("error", {
+        path: req.path,
+        method: req.method,
+        message: message,
+      });
+    } else {
+      logger.error(method, req.path, `\t${message} \n`, error);
+    }
     res.status(500).json({
       success: false,
       message,
       error,
+      statusCode: 500,
     });
   }
 
   private static getMethod(HTTPMehtod: string): string {
-    const lowCase = HTTPMehtod.toUpperCase();
+    const upperCase = HTTPMehtod.toUpperCase();
     switch (HTTPMehtod) {
       case "get":
-        return chalk.blue(lowCase);
+        return chalk.blue(upperCase);
       case "put":
-        return chalk.rgb(255, 165, 0)(lowCase);
+        return chalk.rgb(255, 165, 0)(upperCase);
       case "patch":
-        return chalk.yellow(lowCase);
+        return chalk.yellow(upperCase);
       case "delete":
-        return chalk.red(lowCase);
+        return chalk.red(upperCase);
       case "post":
-        return chalk.green(lowCase);
+        return chalk.green(upperCase);
       default:
-        return lowCase;
+        return chalk.gray(upperCase);
     }
   }
 }
