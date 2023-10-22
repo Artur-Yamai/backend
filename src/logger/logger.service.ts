@@ -1,7 +1,14 @@
 import chalk from "chalk";
 import moment from "moment";
+import pinoLogger from "../logger/pino-logger";
 
-const lessThanTen = (n: number): string => (n < 10 ? `0${n}` : `${n}`);
+interface LogToFile {
+  method?: string;
+  path?: string;
+  message?: string;
+  statusCode?: number;
+  error?: unknown;
+}
 
 class LoggerService {
   private getDate(): string {
@@ -13,6 +20,10 @@ class LoggerService {
 
   private logger(...args: unknown[]): void {
     console.log(this.getDate(), ...args);
+  }
+
+  public logToFile(type: "info" | "warn" | "error", data: LogToFile) {
+    pinoLogger[type]({ data });
   }
 
   public log(...args: unknown[]): void {
