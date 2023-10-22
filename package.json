@@ -6,9 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "prod": "set NODE_ENV=production && node ./dist/index.js",
-    "dev:js": "set NODE_ENV=developer && nodemon ./dist/index.js",
-    "dev:ts": "set NODE_ENV=developer && nodemon ./src/index.ts"
+    "prod": "set NODE_ENV=production&& node ./dist/index.js",
+    "dev:js": "set NODE_ENV=developer&& nodemon ./dist/index.js",
+    "dev:ts": "set NODE_ENV=developer&& nodemon ./src/index.ts"
   },
   "author": "",
   "license": "ISC",
