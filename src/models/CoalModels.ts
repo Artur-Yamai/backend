@@ -170,7 +170,9 @@ export default {
       user_data.user.user_id AS "userId",
       user_data.user.login AS login,
       user_data.user.avatar_url AS "userAvatarUrl",
-      hookah.coal_comment.comment_text AS "text"
+      hookah.coal_comment.comment_text AS "text",
+      CONCAT(hookah.coal_comment.created_at, 'Z') AS "createdAt",
+      CONCAT(hookah.coal_comment.updated_at, 'Z') AS "updatedAt"
     FROM hookah.coal_comment
     INNER JOIN user_data.user ON coal_comment.user_id = user_data.user.user_id
     WHERE coal_comment.coal_id = $1
