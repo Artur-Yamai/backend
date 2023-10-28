@@ -1,14 +1,14 @@
 {
   "name": "hookahdb-backend",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "prod": "export NODE_ENV=production|| set NODE_ENV=production&& node ./dist/index.js",
-    "dev:js": "export NODE_ENV=production|| set NODE_ENV=developer&& nodemon ./dist/index.js",
-    "dev:ts": "export NODE_ENV=production|| set NODE_ENV=developer&& nodemon ./src/index.ts"
+    "dev:js": "export NODE_ENV=developer|| set NODE_ENV=developer&& nodemon ./dist/index.js",
+    "dev:ts": "export NODE_ENV=developer|| set NODE_ENV=developer&& nodemon ./src/index.ts"
   },
   "author": "",
   "license": "ISC",
