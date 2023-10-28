@@ -48,6 +48,11 @@ export default {
         FROM rating.tobacco
         WHERE rating.tobacco.tobacco_id = $1
       ) AS "ratingsQuantity",
+      COALESCE((
+        SELECT value
+        FROM rating.tobacco
+        WHERE rating.tobacco.tobacco_id = $1 AND rating.tobacco.user_id = $2
+      ), 0) AS "myRating",
       COALESCE($2 = (
         SELECT user_id
         FROM rating.tobacco

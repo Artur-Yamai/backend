@@ -47,7 +47,12 @@ export default {
         SELECT COUNT(value)
         FROM rating.coal
         WHERE rating.coal.coal_id = $1
-      ) AS "ratingsQuantity",
+      ) AS "ratingsQuantity",      
+      COALESCE((
+        SELECT value
+        FROM rating.coal
+        WHERE rating.coal.coal_id = $1 AND rating.coal.user_id = $2
+      ), 0) AS "myRating",
       COALESCE($2 = (
         SELECT user_id
         FROM rating.coal
