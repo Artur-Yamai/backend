@@ -5,3 +5,4 @@ export * as CoalController from "./CoalController";
 export * from "./CommentsController";
 export * from "./FavoritesControllers";
 export * from "./RatingsController";
+export * from "./AdminController";
