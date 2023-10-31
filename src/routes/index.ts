@@ -7,4 +7,4 @@ export { router as referenceRoutes } from "./referenceRoutes";
 export { router as coalRouter } from "./coalRouter";
 export { router as technicalRouter } from "./technicalRouter";
 
-export { adminUserRouter } from "./admin";
+export { adminUserRouter, adminLogsRouter } from "./admin";
