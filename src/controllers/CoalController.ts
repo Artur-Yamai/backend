@@ -51,7 +51,7 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 
     const coals = queryResult.rows;
 
-    ResponseHandler.success(req, res, 201, "Получен список всех углей", {
+    ResponseHandler.success(req, res, 200, "Получен список всех углей", {
       success: true,
       body: coals,
     });
