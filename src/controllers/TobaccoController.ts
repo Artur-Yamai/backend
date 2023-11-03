@@ -146,10 +146,9 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
       db.query(CommentModels.deleteCommentsForProductId("tobacco"), [
         tobacco.coal_id,
       ]),
-      db.query(
-        RatingModels.deleteRatingForProductId("tobacco"),
-        tobacco.tobacco_id
-      ),
+      db.query(RatingModels.deleteRatingForProductId("tobacco"), [
+        tobacco.tobacco_id,
+      ]),
       db.query(TobaccoModels.saveDeletedTobacco(), [
         uuidv4(),
         tobacco.tobacco_id,
