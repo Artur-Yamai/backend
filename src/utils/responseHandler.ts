@@ -5,11 +5,11 @@ import logger from "../logger/logger.service";
 export default class ResponseHandler {
   public static forRemoved(req: Request, res: Response, logText: string): void {
     if (process.env.NODE_ENV === "production") {
-      logger.logToFile("info", {
-        path: req.method,
-        method: "delete",
-        message: logText,
-      });
+      // logger.logToFile("info", {
+      //   path: req.method,
+      //   method: "delete",
+      //   message: logText,
+      // });
     } else {
       logger.log(this.getMethod(req.method), req.path, `\t${logText}`);
     }
@@ -33,15 +33,15 @@ export default class ResponseHandler {
     logText: string,
     body: any
   ): void {
-    const method = this.getMethod(req.method.toLowerCase());
+    const method = this.getMethod(req.method);
 
     if (process.env.NODE_ENV == "production") {
-      logger.logToFile("info", {
-        path: req.path,
-        method: req.method,
-        message: logText,
-        statusCode,
-      });
+      // logger.logToFile("info", {
+      //   path: req.path,
+      //   method: req.method,
+      //   message: logText,
+      //   statusCode,
+      // });
     } else {
       logger.log(method, req.path, `\t${logText}`);
     }
@@ -56,15 +56,15 @@ export default class ResponseHandler {
     exceptionText: string = "",
     message: string = ""
   ): void {
-    let method = this.getMethod(req.method.toLowerCase());
+    let method = this.getMethod(req.method);
 
     if (process.env.NODE_ENV === "production") {
-      logger.logToFile("warn", {
-        path: req.path,
-        method: req.method,
-        message: message,
-        statusCode: statusCode,
-      });
+      // logger.logToFile("warn", {
+      //   path: req.path,
+      //   method: req.method,
+      //   message: message,
+      //   statusCode: statusCode,
+      // });
     } else {
       logger.warn(method, req.path, `\t${exceptionText}`);
     }
@@ -82,7 +82,7 @@ export default class ResponseHandler {
     text: string = ""
   ): void {
     const message: string = `SERVER ERROR: ${text}`;
-    let method = this.getMethod(req.method.toLowerCase());
+    let method = this.getMethod(req.method);
 
     if (process.env.NODE_ENV === "production") {
       logger.logToFile("error", {
@@ -102,20 +102,19 @@ export default class ResponseHandler {
   }
 
   private static getMethod(HTTPMehtod: string): string {
-    const upperCase = HTTPMehtod.toUpperCase();
     switch (HTTPMehtod) {
-      case "get":
-        return chalk.blue(upperCase);
-      case "put":
-        return chalk.rgb(255, 165, 0)(upperCase);
-      case "patch":
-        return chalk.yellow(upperCase);
-      case "delete":
-        return chalk.red(upperCase);
-      case "post":
-        return chalk.green(upperCase);
+      case "GET":
+        return chalk.blue(HTTPMehtod);
+      case "PUT":
+        return chalk.rgb(255, 165, 0)(HTTPMehtod);
+      case "PATCH":
+        return chalk.yellow(HTTPMehtod);
+      case "DELETE":
+        return chalk.red(HTTPMehtod);
+      case "POST":
+        return chalk.green(HTTPMehtod);
       default:
-        return chalk.gray(upperCase);
+        return chalk.gray(HTTPMehtod);
     }
   }
 }
