@@ -18,6 +18,7 @@ export default {
       photo_url AS "photoUrl",
       coal_name AS name,
       fabricator.value AS fabricator,
+      fabricator.fabricator_id AS "fabricatorId",
       (
         SELECT
           COALESCE(ROUND(SUM(rating.coal.value) / COUNT(rating.coal.value), 1), 0)
