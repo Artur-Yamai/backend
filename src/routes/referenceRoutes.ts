@@ -8,7 +8,7 @@ const upload: multer.Multer = multer();
 
 router
   .route("/api/reference/:name")
-  .get(checkAuth, ReferenceController.getAll)
+  .get(ReferenceController.getAll)
   .post(
     checkAuth,
     RoleChecking.toCheckForModerator,
