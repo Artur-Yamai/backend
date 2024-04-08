@@ -3,12 +3,13 @@ import jwt from "jsonwebtoken";
 import ip from "ip";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
+import { config } from "dotenv";
 import db, { UserModels } from "../models";
-import { jwtSectretKey } from "../secrets";
 import ResponseHandler from "../utils/responseHandler";
 import { toDeleteFile } from "../helpers";
 import { generatePassword, mailer } from "../utils";
-import { PORT } from "../constants";
+
+config();
 
 const IP = ip.address();
 
@@ -71,6 +72,9 @@ export const auth = async (req: Request, res: Response) => {
       ResponseHandler.exception(req, res, 401, logText, message);
       return;
     }
+
+    const jwtSectretKey: string | undefined = process.env.JWT_SECRET_KEY;
+    if (!jwtSectretKey) throw "JWT_SECRET_KEY is not defined";
 
     const token: string = jwt.sign({ id: user.id }, jwtSectretKey, {
       expiresIn: "60d",
@@ -379,7 +383,7 @@ export const sendNewPasswordByEmail = async (req: Request, res: Response) => {
                 border-bottom: 1px solid gray;
                 padding-bottom: 8px;
               "
-            >Переход на сайт - <a href="${IP}:${PORT}">HookahDB</a> </p>
+            >Переход на сайт - <a href="${IP}:${process.env.PORT}">HookahDB</a> </p>
             <p>Если это Вы не понимаете что это за сообщение и для кого оно, то просто проигнорируйте его.</p>
           </div>
           `,

@@ -1,5 +1,6 @@
 import nodemailer, { SentMessageInfo, SendMailOptions } from "nodemailer";
-import { mailerData } from "../secrets/mailerData";
+import { config } from "dotenv";
+config();
 
 interface MailerResponse {
   error: Error | null;
@@ -8,12 +9,12 @@ interface MailerResponse {
 
 const transporter = nodemailer.createTransport(
   {
-    host: mailerData.host,
+    host: process.env.MAILER_HOST,
     port: 465,
     secure: true,
     auth: {
-      user: mailerData.auth.user,
-      pass: mailerData.auth.pass,
+      user: process.env.MAILER_USER_NAME,
+      pass: process.env.MAILER_PASSWORD,
     },
   },
   { from: "HookahDB <hookahdb@mail.ru>" }
