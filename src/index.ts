@@ -2,12 +2,12 @@ import express, { Response } from "express";
 import cors from "cors";
 import ip from "ip";
 import chalk from "chalk";
+import { config } from "dotenv";
 import {
   avatarsDirName,
   tobaccoDirName,
   coalDirName,
   rootDirNameObj,
-  PORT,
 } from "./constants";
 import {
   technicalRouter,
@@ -22,6 +22,10 @@ import {
   adminLogsRouter,
 } from "./routes";
 import "./utils/PGChangeTypes";
+
+config();
+
+const PORT = process.env.PORT;
 
 const app: express.Express = express();
 

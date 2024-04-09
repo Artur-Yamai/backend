@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
-import { jwtSectretKey } from "../secrets";
+import { config } from "dotenv";
 import logger from "../logger/logger.service";
+
+config();
 
 export const tokenDecoded = (token: string): "" | jwt.JwtPayload => {
   const tkn: string = (token || "").replace(/Bearer\s?/, "");
@@ -8,6 +10,9 @@ export const tokenDecoded = (token: string): "" | jwt.JwtPayload => {
   if (!tkn) return "";
 
   try {
+    const jwtSectretKey: string | undefined = process.env.JWT_SECRET_KEY;
+    if (!jwtSectretKey) throw "JWT_SECRET_KEY is not defined";
+
     const decoded: string | jwt.JwtPayload = jwt.verify(tkn, jwtSectretKey);
     return typeof decoded !== "string" ? decoded : "";
   } catch (error) {
