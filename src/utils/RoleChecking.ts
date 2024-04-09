@@ -9,22 +9,6 @@ export enum RoleCodes {
 }
 
 export class RoleChecking {
-  private static _user: RoleCodes = 0;
-  private static _moderator: RoleCodes = 5;
-  private static _admin: RoleCodes = 10;
-
-  public static USER(): RoleCodes {
-    return this._user;
-  }
-
-  public static MODERATOR(): RoleCodes {
-    return this._moderator;
-  }
-
-  public static ADMIN(): RoleCodes {
-    return this._admin;
-  }
-
   public static rightsCheck = async (
     req: Request,
     res: Response,
@@ -46,9 +30,7 @@ export class RoleChecking {
 
       const userRoleCode = queryResult.rows[0].roleCode;
 
-      if (userRoleCode >= roleCode) {
-        return next();
-      }
+      if (userRoleCode >= roleCode) return next();
 
       const exeptionText: string = `Нет доступа для userId - ${userId}`;
       const message: string = "Недостаточный уровень доступа";
