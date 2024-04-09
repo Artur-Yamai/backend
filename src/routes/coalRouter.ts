@@ -1,10 +1,5 @@
 import { Router, NextFunction, Request, Response } from "express";
-import {
-  RoleChecking,
-  RoleCodes,
-  checkAuth,
-  createFileUploader,
-} from "../utils";
+import { RoleChecking, checkAuth, createFileUploader } from "../utils";
 import { CoalController } from "../controllers";
 import validations from "../validations";
 import { coalDirName } from "../constants";
