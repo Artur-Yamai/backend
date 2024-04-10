@@ -35,6 +35,12 @@ router.put(
   avatarUpload.single("photo"),
   UserController.saveAvatar
 );
+router.put(
+  "/api/user/updatePassword",
+  checkAuth,
+  upload.none(),
+  UserController.updatePassword
+);
 
 router.post(
   "/api/user/restorePassword",
