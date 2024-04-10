@@ -158,6 +158,50 @@ export const saveAvatar = [
   authById,
 ];
 
+export const updatePassword = async (req: Request, res: Response) => {
+  try {
+    const userId = req.headers.userId;
+    const { currentPass, newPass } = req.body;
+
+    const queryResult = await db.query(UserModels.getPasswordHashByUserId(), [
+      userId,
+    ]);
+    const currentPassHash = queryResult.rows[0]?.passwordHash;
+
+    if (!currentPassHash) {
+      const respMessage: string = "Пользователь не найден";
+      const logText: string = `userId - ${userId} : ${respMessage}`;
+      return ResponseHandler.notFound(req, res, logText, respMessage);
+    }
+
+    const isValid: boolean = await bcrypt.compare(currentPass, currentPassHash);
+
+    if (!isValid) {
+      const message: string = "Неверный текущий пароль";
+      const logText: string = `${req.body.login} - ${message}`;
+      ResponseHandler.exception(req, res, 401, logText, message);
+      return;
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const newPassHash = await bcrypt.hash(newPass, salt);
+
+    await db.query(UserModels.updatePasswordByUserId(), [newPassHash, userId]);
+
+    ResponseHandler.success(
+      req,
+      res,
+      200,
+      `userId - ${userId} upadted password`,
+      {
+        success: true,
+      }
+    );
+  } catch (error) {
+    ResponseHandler.error(req, res, error, "Не удалось обновить пароль");
+  }
+};
+
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;

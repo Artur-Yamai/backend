@@ -105,6 +105,12 @@ export default {
     RETURNING (SELECT * FROM oldValue)
   `,
 
+  updatePasswordByUserId: () => `
+    UPDATE user_data.password 
+    SET password_hash = $1 
+    WHERE user_id = $2
+  `,
+
   setRole: () => `
     UPDATE user_data.user 
     SET role_code = $1
