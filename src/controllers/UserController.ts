@@ -13,6 +13,13 @@ config();
 
 const IP = ip.address();
 
+const getTokenById = (id: string): string | null => {
+  const sectretKey: string | undefined = process.env.JWT_SECRET_KEY;
+  if (!sectretKey) throw "JWT_SECRET_KEY is not defined";
+
+  return jwt.sign({ id }, process.env.JWT_SECRET_KEY!, { expiresIn: "90d" });
+};
+
 export const register = async (req: Request, res: Response) => {
   try {
     const { email, password, login, refCode } = req.body;
@@ -73,16 +80,9 @@ export const auth = async (req: Request, res: Response) => {
       return;
     }
 
-    const jwtSectretKey: string | undefined = process.env.JWT_SECRET_KEY;
-    if (!jwtSectretKey) throw "JWT_SECRET_KEY is not defined";
-
-    const token: string = jwt.sign({ id: user.id }, jwtSectretKey, {
-      expiresIn: "60d",
-    });
-
     ResponseHandler.success(req, res, 200, `userId - ${user.id}`, {
       success: true,
-      data: { user, token },
+      data: { user, token: getTokenById(user.id) },
     });
   } catch (error) {
     ResponseHandler.error(req, res, error, "Не удалось авторизоваться");
@@ -105,6 +105,7 @@ export const authById = async (req: Request, res: Response) => {
     ResponseHandler.success(req, res, 200, `userId - ${user.id}`, {
       success: true,
       body: user,
+      token: getTokenById(user.id),
     });
   } catch (error) {
     ResponseHandler.error(req, res, error, "Нет доступа");
