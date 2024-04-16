@@ -1,8 +1,5 @@
 import jwt from "jsonwebtoken";
-import { config } from "dotenv";
 import logger from "../logger/logger.service";
-
-config();
 
 export const tokenDecoded = (token: string): "" | jwt.JwtPayload => {
   const tkn: string = (token || "").replace(/Bearer\s?/, "");

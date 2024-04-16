@@ -2,28 +2,14 @@ import express, { Response } from "express";
 import cors from "cors";
 import ip from "ip";
 import chalk from "chalk";
-import { config } from "dotenv";
 import {
   avatarsDirName,
   tobaccoDirName,
   coalDirName,
   rootDirNameObj,
 } from "./constants";
-import {
-  technicalRouter,
-  UserRouter,
-  TobaccoRoutes,
-  CommentRoutes,
-  favoriteRoutes,
-  ratingRoutes,
-  referenceRoutes,
-  coalRouter,
-  adminUserRouter,
-  adminLogsRouter,
-} from "./routes";
+import routes from "./routes";
 import "./utils/PGChangeTypes";
-
-config();
 
 const PORT = process.env.PORT;
 
@@ -36,17 +22,7 @@ app.use("/uploads/coals", express.static(coalDirName));
 app.use("/static/*", express.static("/dist/client"));
 app.use(cors());
 
-app.use(technicalRouter);
-app.use(UserRouter);
-app.use(TobaccoRoutes);
-app.use(CommentRoutes);
-app.use(favoriteRoutes);
-app.use(ratingRoutes);
-app.use(referenceRoutes);
-app.use(coalRouter);
-
-app.use(adminUserRouter);
-app.use(adminLogsRouter);
+routes.forEach((route) => app.use(route));
 
 app.get("/admin*", (_, res: Response) =>
   res.sendFile("/adminpanel/index.html", rootDirNameObj)

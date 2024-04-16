@@ -1,6 +1,4 @@
 import nodemailer, { SentMessageInfo, SendMailOptions } from "nodemailer";
-import { config } from "dotenv";
-config();
 
 interface MailerResponse {
   error: Error | null;
