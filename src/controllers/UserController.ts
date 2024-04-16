@@ -3,13 +3,10 @@ import jwt from "jsonwebtoken";
 import ip from "ip";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
-import { config } from "dotenv";
 import db, { UserModels } from "../models";
 import ResponseHandler from "../utils/responseHandler";
 import { toDeleteFile } from "../helpers";
 import { generatePassword, mailer } from "../utils";
-
-config();
 
 const IP = ip.address();
 

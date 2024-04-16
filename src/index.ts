@@ -2,7 +2,6 @@ import express, { Response } from "express";
 import cors from "cors";
 import ip from "ip";
 import chalk from "chalk";
-import { config } from "dotenv";
 import {
   avatarsDirName,
   tobaccoDirName,
@@ -11,8 +10,6 @@ import {
 } from "./constants";
 import routes from "./routes";
 import "./utils/PGChangeTypes";
-
-config();
 
 const PORT = process.env.PORT;
 
